@@ -12,6 +12,10 @@ public class Parser {
 
   private var saveDepth = 0
 
+  private var currentLine = ""
+  private var lineNumber = 0
+  private var charNumber = 0
+
   private enum Status {
     case none
     case indent
@@ -23,7 +27,7 @@ public class Parser {
   public func readChar() -> Character {
     if status != .none {
       return "\0"
-    } 
+    }
     let readNextChar: () -> Character = {
       if let history = self.history {
         if self.historyPosition == history.count {
@@ -43,6 +47,21 @@ public class Parser {
       return self.stream.readChar()
     }
     if isAtBeginningOfLine {
+      lineNumber += 1
+      charNumber = 0
+      var currentLine = ""
+      save {
+        while true {
+          switch readNextChar() {
+          case "\n", "\0":
+            return .restore
+          case let char:
+            currentLine.append(char)
+          }
+        }
+      }
+      self.currentLine = currentLine
+
       isAtBeginningOfLine = false
       var level = 0
       var char: Character = "\0"
@@ -63,7 +82,7 @@ public class Parser {
           _ = readNextChar()
           level -= 1
         }
-        
+
         char = readNextChar()
         if char == "\n" {
           self.isAtBeginningOfLine = true
@@ -75,6 +94,7 @@ public class Parser {
             self.indentLevel.removeLast()
             self.status = .dedent
             self.isAtBeginningOfLine = true
+            lineNumber -= 1
             return "\0"
         } else if amountLevelChanged == 0 {
           while level > 0 {
@@ -87,6 +107,7 @@ public class Parser {
             self.indentLevel.append(level)
             self.status = .indent
             self.isAtBeginningOfLine = true
+            lineNumber -= 1
             return "\0"
           } else {
             level = indentLevel.last ?? 0
@@ -99,12 +120,13 @@ public class Parser {
         }
       }
     }
+    charNumber += 1
     let char = readNextChar()
     if char == "\n" {
       isAtBeginningOfLine = true
     }
     return char
-   
+
   }
 
   public enum SaveStatus {
@@ -124,13 +146,19 @@ public class Parser {
     let savedIsAtBeginningOfLine = isAtBeginningOfLine
     let savedIndentLevel = indentLevel
     let status = self.status
+    let currentLine = self.currentLine
+    let lineNumber = self.lineNumber
+    let charNumber = self.charNumber
 
-    if block() == .restore { 
+    if block() == .restore {
       historyPosition = position
       isConvertingIndents = savedIsConvertingIndents
       isAtBeginningOfLine = savedIsAtBeginningOfLine
       indentLevel = savedIndentLevel
       self.status = status
+      self.currentLine = currentLine
+      self.lineNumber = lineNumber
+      self.charNumber = charNumber
     }
     saveDepth -= 1
     if historyPosition == history?.count && saveDepth == 0 {
@@ -151,7 +179,7 @@ public class Parser {
     let savedIndentLevel = indentLevel
     let status = self.status
 
-    if try block() == .restore { 
+    if try block() == .restore {
       historyPosition = position
       isConvertingIndents = savedIsConvertingIndents
       isAtBeginningOfLine = savedIsAtBeginningOfLine
