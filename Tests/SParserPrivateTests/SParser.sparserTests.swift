@@ -7,10 +7,10 @@ class SParserTests: XCTestCase {
     let parser = Parser(stream: StringStream(from: "ruleName\n  type\n    ruleType\n  ::= \"123\" F12\n    evaluator1\n"))
     parser.isConvertingIndents = true
     let syntax = try parser.readSyntax()
-    XCTAssertEqual(syntax?[0].patterns[0].terms.count, 2)
-    XCTAssertEqual(syntax?[0].patterns[0].terms[0], Term.quoted("123"))
-    XCTAssertEqual(syntax?[0].patterns[0].terms[1], Term.named("F12"))
-    XCTAssertEqual(syntax?[0].patterns[0].evaluator, "evaluator1")
+    XCTAssertEqual(syntax?.rules[0].patterns[0].terms.count, 2)
+    XCTAssertEqual(syntax?.rules[0].patterns[0].terms[0], Term.quoted("123"))
+    XCTAssertEqual(syntax?.rules[0].patterns[0].terms[1], Term.named("F12"))
+    XCTAssertEqual(syntax?.rules[0].patterns[0].evaluator, "evaluator1")
   }
 
   func testReadRules() throws {

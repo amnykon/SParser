@@ -1,8 +1,30 @@
+imports
+  Foundation
+  SParserLibs
 syntax
   type
-    [Rule]
+    Syntax
+  ::= importRule rules
+    return Syntax(imports: importRule, rules: rules)
   ::= rules
-    return rules
+    return Syntax(imports: [], rules: rules)
+importRule
+  type
+    [String]
+  ::= "imports\n" indent imports dedent
+    return imports
+imports
+  type
+    [String]
+  ::= importFramework imports
+    return [importFramework] + imports
+  ::=
+    return []
+importFramework
+  type
+    String
+  ::= line
+    return line
 rules
   type
     [Rule]

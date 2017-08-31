@@ -13,10 +13,11 @@ for inFile in CommandLine.arguments.dropFirst() {
   let parser = Parser(stream: inStream)
   parser.isConvertingIndents = true
   do {
-    let syntax = try parser.readSyntax()
-    for rule in syntax ?? [] {
-      print(rule.buildString())
+    guard let syntax = try parser.readSyntax() else {
+      print("Error while reading Syntax") /* TODO make more descriptive */
+      continue
     }
+    print(syntax.buildString())
   } catch {
     print("Error while reading Syntax") /* TODO make more descriptive */
     continue

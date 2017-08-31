@@ -1,14 +1,77 @@
 import Foundation
 import SParserLibs
+fileprivate func evalSyntax(importRule: Parser.ImportRuleType, rules: Parser.RulesType) -> Parser.SyntaxType {
+  return Syntax(imports: importRule, rules: rules)
+}
+
 fileprivate func evalSyntax(rules: Parser.RulesType) -> Parser.SyntaxType {
-  return rules
+  return Syntax(imports: [], rules: rules)
 }
 
 extension Parser {
-  public typealias SyntaxType = [Rule]
+  public typealias SyntaxType = Syntax
   public func readSyntax() throws -> SyntaxType? {
+    if let importRule = try readImportRule() {
+      if let rules = try readRules() {
+        return evalSyntax(importRule: importRule, rules: rules)
+      }
+    }
     if let rules = try readRules() {
       return evalSyntax(rules: rules)
+    }
+    return nil
+  }
+}
+
+fileprivate func evalImportRule(indent: Parser.IndentType, imports: Parser.ImportsType, dedent: Parser.DedentType) -> Parser.ImportRuleType {
+  return imports
+}
+
+extension Parser {
+  public typealias ImportRuleType = [String]
+  public func readImportRule() throws -> ImportRuleType? {
+    if matches(string: "imports\n") {
+      if let indent = try readIndent() {
+        if let imports = try readImports() {
+          if let dedent = try readDedent() {
+            return evalImportRule(indent: indent, imports: imports, dedent: dedent)
+          }
+        }
+      }
+    }
+    return nil
+  }
+}
+
+fileprivate func evalImports(importFramework: Parser.ImportFrameworkType, imports: Parser.ImportsType) -> Parser.ImportsType {
+  return [importFramework] + imports
+}
+
+fileprivate func evalImports() -> Parser.ImportsType {
+  return []
+}
+
+extension Parser {
+  public typealias ImportsType = [String]
+  public func readImports() throws -> ImportsType? {
+    if let importFramework = try readImportFramework() {
+      if let imports = try readImports() {
+        return evalImports(importFramework: importFramework, imports: imports)
+      }
+    }
+    return evalImports()
+  }
+}
+
+fileprivate func evalImportFramework(line: Parser.LineType) -> Parser.ImportFrameworkType {
+  return line
+}
+
+extension Parser {
+  public typealias ImportFrameworkType = String
+  public func readImportFramework() throws -> ImportFrameworkType? {
+    if let line = try readLine() {
+      return evalImportFramework(line: line)
     }
     return nil
   }
