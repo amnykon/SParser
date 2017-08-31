@@ -1,0 +1,181 @@
+import Foundation
+import SParserLibs
+fileprivate func evalSyntax(rules: Parser.RulesType) -> Parser.SyntaxType {
+  return rules
+}
+
+extension Parser {
+  public typealias SyntaxType = [Rule]
+  public func readSyntax() throws -> SyntaxType? {
+    if let rules = try readRules() {
+      return evalSyntax(rules: rules)
+    }
+    return nil
+  }
+}
+
+fileprivate func evalRules(rule: Parser.RuleType, rules: Parser.RulesType) -> Parser.RulesType {
+  return [rule] + rules
+}
+
+fileprivate func evalRules() -> Parser.RulesType {
+  return []
+}
+
+extension Parser {
+  public typealias RulesType = [Rule]
+  public func readRules() throws -> RulesType? {
+    if let rule = try readRule() {
+      if let rules = try readRules() {
+        return evalRules(rule: rule, rules: rules)
+      }
+    }
+    return evalRules()
+  }
+}
+
+fileprivate func evalRule(name: Parser.NameType, indent: Parser.IndentType, type: Parser.TypeType, patterns: Parser.PatternsType, dedent: Parser.DedentType) -> Parser.RuleType {
+  return Rule(name: name, type: type, patterns: patterns)
+}
+
+extension Parser {
+  public typealias RuleType = Rule
+  public func readRule() throws -> RuleType? {
+    if let name = try readName() {
+      if matches(string: "\n") {
+        if let indent = try readIndent() {
+          if let type = try readType() {
+            if let patterns = try readPatterns() {
+              if let dedent = try readDedent() {
+                return evalRule(name: name, indent: indent, type: type, patterns: patterns, dedent: dedent)
+              }
+            }
+          }
+        }
+      }
+    }
+    return nil
+  }
+}
+
+fileprivate func evalType(indent: Parser.IndentType, line: Parser.LineType, dedent: Parser.DedentType) -> Parser.TypeType {
+  return line
+}
+
+extension Parser {
+  public typealias TypeType = String
+  public func readType() throws -> TypeType? {
+    if matches(string: "type\n") {
+      if let indent = try readIndent() {
+        if let line = try readLine() {
+          if let dedent = try readDedent() {
+            return evalType(indent: indent, line: line, dedent: dedent)
+          }
+        }
+      }
+    }
+    return nil
+  }
+}
+
+fileprivate func evalPatterns(pattern: Parser.PatternType, patterns: Parser.PatternsType) -> Parser.PatternsType {
+  return [pattern] + patterns
+}
+
+fileprivate func evalPatterns() -> Parser.PatternsType {
+  return []
+}
+
+extension Parser {
+  public typealias PatternsType = [Pattern]
+  public func readPatterns() throws -> PatternsType? {
+    if let pattern = try readPattern() {
+      if let patterns = try readPatterns() {
+        return evalPatterns(pattern: pattern, patterns: patterns)
+      }
+    }
+    return evalPatterns()
+  }
+}
+
+fileprivate func evalPattern(cws: Parser.CwsType, terms: Parser.TermsType, multiLineString: Parser.MultiLineStringType) -> Parser.PatternType {
+  return Pattern(terms: terms, evaluator: multiLineString)
+}
+
+extension Parser {
+  public typealias PatternType = Pattern
+  public func readPattern() throws -> PatternType? {
+    if matches(string: "::=") {
+      if let cws = try readCws() {
+        if let terms = try readTerms() {
+          if matches(string: "\n") {
+            if let multiLineString = try readMultiLineString() {
+              return evalPattern(cws: cws, terms: terms, multiLineString: multiLineString)
+            }
+          }
+        }
+      }
+    }
+    return nil
+  }
+}
+
+fileprivate func evalTerms(term: Parser.TermType, cws: Parser.CwsType, terms: Parser.TermsType) -> Parser.TermsType {
+  return [term] + terms
+}
+
+fileprivate func evalTerms() -> Parser.TermsType {
+  return []
+}
+
+extension Parser {
+  public typealias TermsType = [Term]
+  public func readTerms() throws -> TermsType? {
+    if let term = try readTerm() {
+      if let cws = try readCws() {
+        if let terms = try readTerms() {
+          return evalTerms(term: term, cws: cws, terms: terms)
+        }
+      }
+    }
+    return evalTerms()
+  }
+}
+
+fileprivate func evalTerm(name: Parser.NameType) -> Parser.TermType {
+  return .named(name)
+}
+
+fileprivate func evalTerm(quotedString: Parser.QuotedStringType) -> Parser.TermType {
+  return .quoted(quotedString)
+}
+
+extension Parser {
+  public typealias TermType = Term
+  public func readTerm() throws -> TermType? {
+    if let name = try readName() {
+      return evalTerm(name: name)
+    }
+    if let quotedString = try readQuotedString() {
+      return evalTerm(quotedString: quotedString)
+    }
+    return nil
+  }
+}
+
+fileprivate func evalName(letter: Parser.LetterType, letterDigits: Parser.LetterDigitsType) -> Parser.NameType {
+  return String(letter) + letterDigits
+}
+
+extension Parser {
+  public typealias NameType = String
+  public func readName() throws -> NameType? {
+    if let letter = try readLetter() {
+      if let letterDigits = try readLetterDigits() {
+        return evalName(letter: letter, letterDigits: letterDigits)
+      }
+    }
+    return nil
+  }
+}
+

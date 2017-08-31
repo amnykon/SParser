@@ -1,0 +1,53 @@
+syntax
+  type
+    [Rule]
+  ::= rules
+    return rules
+rules
+  type
+    [Rule]
+  ::= rule rules
+    return [rule] + rules
+  ::=
+    return []
+rule
+  type
+    Rule
+  ::= name "\n" indent type patterns dedent
+    return Rule(name: name, type: type, patterns: patterns)
+type
+  type
+    String
+  ::= "type\n" indent line dedent
+    return line
+patterns
+  type
+    [Pattern]
+  ::= pattern patterns
+    return [pattern] + patterns
+  ::=
+    return []
+pattern
+  type
+    Pattern
+  ::= "::=" cws terms "\n" multiLineString
+    return Pattern(terms: terms, evaluator: multiLineString)
+terms
+  type
+    [Term]
+  ::= term cws terms
+    return [term] + terms
+  ::=
+    return []
+term
+  type
+    Term
+  ::= name
+    return .named(name)
+  ::= quotedString
+    return .quoted(quotedString)
+name
+  type
+    String
+  ::= letter letterDigits
+    return String(letter) + letterDigits
