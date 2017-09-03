@@ -2,6 +2,15 @@ public enum Term {
   case named(String)
   case quoted(String)
 
+  public func getName() -> String {
+    switch self {
+      case let .named(name):
+        return name
+      case let .quoted(quoted):
+        return "\\\"\(quoted)\\\""
+    }
+  }
+
   public func buildConditionString() -> String {
     switch self {
       case let .named(name):

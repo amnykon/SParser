@@ -49,8 +49,10 @@ class TermNodeTests: XCTestCase {
     let expected = 
       "if let number = try readNumber() {\n" +
       "  if matches(string: \"term1\") {\n" +
+      "    try throwError(message:\"error parsing addTerm. expect \")\n" +
       "  }\n" +
       "  if let term2 = try readTerm2() {\n" +
+      "    try throwError(message:\"error parsing addTerm. expect \")\n" +
       "  }\n" +
       "  return evalAddTerm()\n" +
       "}\n" 
