@@ -13,7 +13,7 @@ class TermNode {
         if isRoot {
           return indent + "  return nil\n"
         }
-        return ""
+        return indent + "  try throwError(message:\"error parsing \(ruleName)\")\n"
       }
       return indent + "  " + pattern.buildEvaluatorCall(ruleName: ruleName)
     }()

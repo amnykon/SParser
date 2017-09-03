@@ -15,6 +15,7 @@ extension Parser {
       if let rules = try readRules() {
         return evalSyntax(importRule: importRule, rules: rules)
       }
+      try throwError(message:"error parsing syntax")
     }
     if let rules = try readRules() {
       return evalSyntax(rules: rules)
@@ -36,8 +37,11 @@ extension Parser {
           if let dedent = try readDedent() {
             return evalImportRule(indent: indent, imports: imports, dedent: dedent)
           }
+          try throwError(message:"error parsing importRule")
         }
+        try throwError(message:"error parsing importRule")
       }
+      try throwError(message:"error parsing importRule")
     }
     return nil
   }
@@ -58,6 +62,7 @@ extension Parser {
       if let imports = try readImports() {
         return evalImports(importFramework: importFramework, imports: imports)
       }
+      try throwError(message:"error parsing imports")
     }
     return evalImports()
   }
@@ -92,6 +97,7 @@ extension Parser {
       if let rules = try readRules() {
         return evalRules(rule: rule, rules: rules)
       }
+      try throwError(message:"error parsing rules")
     }
     return evalRules()
   }
@@ -112,10 +118,15 @@ extension Parser {
               if let dedent = try readDedent() {
                 return evalRule(name: name, indent: indent, type: type, patterns: patterns, dedent: dedent)
               }
+              try throwError(message:"error parsing rule")
             }
+            try throwError(message:"error parsing rule")
           }
+          try throwError(message:"error parsing rule")
         }
+        try throwError(message:"error parsing rule")
       }
+      try throwError(message:"error parsing rule")
     }
     return nil
   }
@@ -134,8 +145,11 @@ extension Parser {
           if let dedent = try readDedent() {
             return evalType(indent: indent, line: line, dedent: dedent)
           }
+          try throwError(message:"error parsing type")
         }
+        try throwError(message:"error parsing type")
       }
+      try throwError(message:"error parsing type")
     }
     return nil
   }
@@ -156,6 +170,7 @@ extension Parser {
       if let patterns = try readPatterns() {
         return evalPatterns(pattern: pattern, patterns: patterns)
       }
+      try throwError(message:"error parsing patterns")
     }
     return evalPatterns()
   }
@@ -175,9 +190,13 @@ extension Parser {
             if let multiLineString = try readMultiLineString() {
               return evalPattern(cws: cws, terms: terms, multiLineString: multiLineString)
             }
+            try throwError(message:"error parsing pattern")
           }
+          try throwError(message:"error parsing pattern")
         }
+        try throwError(message:"error parsing pattern")
       }
+      try throwError(message:"error parsing pattern")
     }
     return nil
   }
@@ -199,7 +218,9 @@ extension Parser {
         if let terms = try readTerms() {
           return evalTerms(term: term, cws: cws, terms: terms)
         }
+        try throwError(message:"error parsing terms")
       }
+      try throwError(message:"error parsing terms")
     }
     return evalTerms()
   }
@@ -237,6 +258,7 @@ extension Parser {
       if let letterDigits = try readLetterDigits() {
         return evalName(letter: letter, letterDigits: letterDigits)
       }
+      try throwError(message:"error parsing name")
     }
     return nil
   }

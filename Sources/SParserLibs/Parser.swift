@@ -230,6 +230,10 @@ public class Parser {
     return nil
   }
 
+  public func throwError(message: String) throws {
+    throw ParserError(message: "\(lineNumber):\(charNumber):\(message)")
+  }
+
   public init(stream: Stream) {
     self.stream = stream
   }
