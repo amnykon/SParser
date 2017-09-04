@@ -3,6 +3,8 @@ class TermNode {
   var pattern: Pattern? = nil
   var children: [TermNode] = []
 
+  var isRecursive: Bool = false
+
   var isRoot: Bool {
     return term == nil
   }
@@ -10,6 +12,9 @@ class TermNode {
   func buildString(ruleName: String, indent: String) -> String {
     let evaluatorCall: String = {
       guard let pattern = pattern else {
+        if isRecursive {
+          return indent + "  return \(ruleName)\n"
+        }
         if isRoot {
           return indent + "  return nil\n"
         }
@@ -18,7 +23,7 @@ class TermNode {
       return indent + "  " + pattern.buildEvaluatorCall(ruleName: ruleName)
     }()
     return [
-      term != nil ? indent + "if \(term?.buildConditionString() ?? "") {\n" : "",
+      isRecursive ? "" : term != nil ? indent + "if \(term?.buildConditionString() ?? "") {\n" : "",
       children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ")}.joined(),
       evaluatorCall,
       indent + "}\n"

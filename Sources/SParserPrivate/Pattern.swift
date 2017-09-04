@@ -30,7 +30,7 @@ public struct Pattern {
         return "\(name): \(name)"
       }
     }.joined(separator: ", ")
-    return "return eval\(ruleName.capitalizedFirstLetter())(\(termsString))\n"
+    return "return try recursivelyRead(\(ruleName): eval\(ruleName.capitalizedFirstLetter())(\(termsString)))\n"
   }
 }
 

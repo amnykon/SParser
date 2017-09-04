@@ -28,8 +28,8 @@ importFramework
 rules
   type
     [Rule]
-  ::= rule rules
-    return [rule] + rules
+  ::= rules rule
+    return rules + [rule]
   ::=
     return []
 rule

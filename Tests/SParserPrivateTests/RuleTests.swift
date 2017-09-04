@@ -24,7 +24,7 @@ class RuleTests: XCTestCase {
         ),
         Pattern(
           terms: [
-            .named("name"),
+            .named("name1"),
           ],
           evaluator: "return []"
         ),
@@ -40,12 +40,16 @@ class RuleTests: XCTestCase {
       "  return quote2\n",
       "}\n",
       "\n",
-      "fileprivate func evalName(name: Parser.NameType) -> Parser.NameType {\n",
+      "fileprivate func evalName(name1: Parser.Name1Type) -> Parser.NameType {\n",
       "  return []\n",
       "}\n",
       "\n",
       "extension Parser {\n",
       "  public typealias NameType = type\n",
+      "  private func recursivelyReadName() throws -> NameType? {\n" +
+      "    return nil\n" +
+      "  }\n" +
+      "}\n" +
       "  public func readName() throws -> NameType? {\n",
       "    if matches(string: \"quote\") {\n",
       "      if matches(string: \"quote1\") {\n",
@@ -56,8 +60,8 @@ class RuleTests: XCTestCase {
       "      }\n",
       "      try throwError(message:\"error parsing name. expect \\\"quote1\\\", \\\"quote2\\\"\")\n",
       "    }\n",
-      "    if let name = try readName() {\n",
-      "      return evalName(name: name)\n",
+      "    if let name1 = try readName1() {\n",
+      "      return evalName(name1: name1)\n",
       "    }\n",
       "    return nil\n",
       "  }\n",
