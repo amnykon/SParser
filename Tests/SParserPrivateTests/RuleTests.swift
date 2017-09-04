@@ -54,6 +54,7 @@ class RuleTests: XCTestCase {
       "      if matches(string: \"quote2\") {\n",
       "        return evalName()\n",
       "      }\n",
+      "      try throwError(message:\"error parsing name. expect \\\"quote1\\\", \\\"quote2\\\"\")\n",
       "    }\n",
       "    if let name = try readName() {\n",
       "      return evalName(name: name)\n",

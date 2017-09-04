@@ -8,6 +8,7 @@ class TermNodeTests: XCTestCase {
 
     let expected = 
       "if let number = try readNumber() {\n" +
+      "  try throwError(message:\"error parsing addTerm. expect \")\n" +
       "}\n" 
     XCTAssertEqual(termNode.buildString(ruleName:"addTerm", indent: ""), expected)
   }
@@ -22,9 +23,12 @@ class TermNodeTests: XCTestCase {
     let expected = 
       "if let parentNode = try readParentNode() {\n" +
       "  if matches(string: \"term1\") {\n" +
+      "    try throwError(message:\"error parsing addTerm. expect \")\n" +
       "  }\n" +
       "  if let term2 = try readTerm2() {\n" +
+      "    try throwError(message:\"error parsing addTerm. expect \")\n" +
       "  }\n" +
+      "  try throwError(message:\"error parsing addTerm. expect \\\"term1\\\", term2\")\n" +
       "}\n"
     XCTAssertEqual(termNode.buildString(ruleName:"addTerm", indent: ""), expected)
   }
