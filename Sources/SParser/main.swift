@@ -5,7 +5,8 @@ import SParserLibs
 for inFile in CommandLine.arguments.dropFirst() {
   let inUrl = NSURL.fileURL(withPath: inFile)
   let outUrl = NSURL.fileURL(withPath: inFile + ".swift")
-  print(outUrl)
+  print("\(inUrl.absoluteString) -> \(outUrl.absoluteString)")
+
   guard let inStream = try? UrlStream(from: inUrl) else {
     print("Error: Unable to open file \"\(inFile)\"")
     continue
@@ -14,10 +15,10 @@ for inFile in CommandLine.arguments.dropFirst() {
   parser.isConvertingIndents = true
   do {
     guard let syntax = try parser.readSyntax() else {
-      print("Error while reading Syntax") /* TODO make more descriptive */
+      print("Error1 while reading Syntax") /* TODO make more descriptive */
       continue
     }
-    print(syntax.buildString())
+    try syntax.buildString().write(to: outUrl, atomically: false, encoding: .utf8)
   } catch {
     print("Error while reading Syntax") /* TODO make more descriptive */
     continue
