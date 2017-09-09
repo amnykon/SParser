@@ -45,15 +45,15 @@ type
 patterns
   type
     [Pattern]
-  ::= pattern patterns
-    return [pattern] + patterns
+  ::= patterns pattern
+    return patterns + [Pattern(terms: pattern.terms, evaluator: pattern.evaluator, id: patterns.count)]
   ::=
     return []
 pattern
   type
     Pattern
   ::= "::=" cws terms "\n" multiLineString
-    return Pattern(terms: terms, evaluator: multiLineString)
+    return Pattern(terms: terms, evaluator: multiLineString, id: 0)
 terms
   type
     [Term]

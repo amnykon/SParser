@@ -3,6 +3,7 @@ import Foundation
 public struct Pattern {
   public let terms: [Term]
   public let evaluator: String
+  public let id: Int
 
   func buildEvaluatorString(ruleName: String) -> String {
     let termsString = terms.flatMap{
@@ -15,7 +16,7 @@ public struct Pattern {
       }
     }.joined(separator: ", ")
     return 
-      "fileprivate func eval\(ruleName.capitalizedFirstLetter())(\(termsString)) -> Parser.\(ruleName.capitalizedFirstLetter())Type {\n" +
+      "fileprivate func eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)) -> Parser.\(ruleName.capitalizedFirstLetter())Type {\n" +
       "  \(evaluator)\n" +
       "}\n"
   }
@@ -30,7 +31,7 @@ public struct Pattern {
         return "\(name): \(name)"
       }
     }.joined(separator: ", ")
-    return "return try recursivelyRead(\(ruleName): eval\(ruleName.capitalizedFirstLetter())(\(termsString)))\n"
+    return "return try recursivelyRead(\(ruleName): eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)))\n"
   }
 }
 
