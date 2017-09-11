@@ -19,6 +19,9 @@ for inFile in CommandLine.arguments.dropFirst() {
       continue
     }
     try syntax.buildString().write(to: outUrl, atomically: false, encoding: .utf8)
+  } catch let error as ParserError {
+    print(error.message)
+    continue
   } catch {
     print("Error while reading Syntax") /* TODO make more descriptive */
     continue
