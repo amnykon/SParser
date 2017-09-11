@@ -34,17 +34,17 @@ class TermNodeTests: XCTestCase {
   }
 
   func testBuildStringWithPattern() {
-    let termNode = TermNode(term: .named("number"), pattern: Pattern(terms: [], evaluator: "return []"))
+    let termNode = TermNode(term: .named("number"), pattern: Pattern(terms: [], evaluator: "return []", id: 0))
 
     let expected = 
       "if let number = try readNumber() {\n" +
-      "  return evalAddTerm()\n" +
+      "  return try recursivelyRead(addTerm: eval0AddTerm())\n" +
       "}\n" 
     XCTAssertEqual(termNode.buildString(ruleName:"addTerm", indent: ""), expected)
   }
 
   func testBuildStringWithChildrenAndPattern() {
-    let termNode = TermNode(term: .named("number"), pattern: Pattern(terms: [], evaluator: "return []"))
+    let termNode = TermNode(term: .named("number"), pattern: Pattern(terms: [], evaluator: "return []", id: 0))
     termNode.children = [
       TermNode(term: .quoted("term1")),
       TermNode(term: .named("term2")),
@@ -58,7 +58,7 @@ class TermNodeTests: XCTestCase {
       "  if let term2 = try readTerm2() {\n" +
       "    try throwError(message:\"error parsing addTerm. expect \")\n" +
       "  }\n" +
-      "  return evalAddTerm()\n" +
+      "  return try recursivelyRead(addTerm: eval0AddTerm())\n" +
       "}\n" 
     XCTAssertEqual(termNode.buildString(ruleName:"addTerm", indent: ""), expected)
   }
@@ -73,10 +73,10 @@ class TermNodeTests: XCTestCase {
   }
 
   func testBuildStringWithPatternWhileRoot() {
-    let termNode = TermNode(term: nil, pattern: Pattern(terms: [], evaluator: "return []"))
+    let termNode = TermNode(term: nil, pattern: Pattern(terms: [], evaluator: "return []", id: 0))
 
     let expected = 
-      "  return evalAddTerm()\n" +
+      "  return try recursivelyRead(addTerm: eval0AddTerm())\n" +
       "}\n" 
     XCTAssertEqual(termNode.buildString(ruleName:"addTerm", indent: ""), expected)
   }

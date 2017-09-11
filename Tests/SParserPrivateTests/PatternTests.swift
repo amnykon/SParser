@@ -10,11 +10,12 @@ class PatternTests: XCTestCase {
         .quoted("+"),
         .named("rhs"),
       ],
-      evaluator: "return rhs + lhs"
+      evaluator: "return rhs + lhs",
+      id: 0
     )
 
     let expected = 
-      "fileprivate func evalAddTerm(lhs: Parser.LhsType, rhs: Parser.RhsType) -> Parser.AddTermType {\n" +
+      "fileprivate func eval0AddTerm(lhs: Parser.LhsType, rhs: Parser.RhsType) -> Parser.AddTermType {\n" +
       "  return rhs + lhs\n" +
       "}\n"
     XCTAssertEqual(pattern.buildEvaluatorString(ruleName:"addTerm"), expected)
@@ -27,10 +28,11 @@ class PatternTests: XCTestCase {
         .quoted("+"),
         .named("rhs"),
       ],
-      evaluator: "return rhs + lhs"
+      evaluator: "return rhs + lhs",
+      id: 0
     )
 
-    let expected = "return evalAddTerm(lhs: lhs, rhs: rhs)\n"
+    let expected = "return try recursivelyRead(addTerm: eval0AddTerm(lhs: lhs, rhs: rhs))\n"
     XCTAssertEqual(pattern.buildEvaluatorCall(ruleName:"addTerm"), expected)
   }
 }
