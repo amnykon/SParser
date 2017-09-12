@@ -231,7 +231,14 @@ public class Parser {
   }
 
   public func throwError(message: String) throws {
-    throw ParserError(message: "\(lineNumber):\(charNumber):\(message)")
+    let errorPosition = charNumber + (indentLevel.last ?? 0)
+    throw ParserError(
+      message: [
+        "\(lineNumber):\(errorPosition):\(message)",
+        currentLine,
+        Array(repeating: " ", count: errorPosition).joined() + "^",
+      ].joined(separator: "\n")
+    )
   }
 
   public init(stream: Stream) {
