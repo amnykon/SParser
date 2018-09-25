@@ -6,7 +6,7 @@ public struct Pattern {
   public let id: Int
 
   func buildEvaluatorString(ruleName: String) -> String {
-    let termsString = terms.flatMap{
+    let termsString = terms.compactMap{
       (term)->String? in
       switch term {
       case .quoted:
@@ -22,7 +22,7 @@ public struct Pattern {
   }
 
   func buildEvaluatorCall(ruleName: String) -> String {
-    let termsString = terms.flatMap{
+    let termsString = terms.compactMap{
       (term)->String? in
       switch term {
       case .quoted:

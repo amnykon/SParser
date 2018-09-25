@@ -5,7 +5,7 @@ public class StringStream: Stream {
   private let string: String
 
   public func readChar() -> Character {
-    if position == string.characters.count {
+    if position == string.count {
       return "\0"
     }
     defer {

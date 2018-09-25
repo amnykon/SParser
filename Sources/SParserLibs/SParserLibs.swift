@@ -197,17 +197,17 @@ extension Parser {
     var position = 0
     save() {
       while true {
-        if position == string.characters.count {
+        if position == string.count {
           return .discard
         }
 
-        if readChar() != string.characters[string.index(string.startIndex, offsetBy: position)] {
+        if readChar() != string[string.index(string.startIndex, offsetBy: position)] {
           return .restore
         }
        position += 1
       }
     }
-    return position == string.characters.count
+    return position == string.count
   }
 }
 
