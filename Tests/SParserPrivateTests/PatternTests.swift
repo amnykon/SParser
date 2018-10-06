@@ -3,7 +3,7 @@ import SParserLibs
 @testable import SParserPrivate
 
 class PatternTests: XCTestCase {
-  func testBuildEvaluatorString() {
+  func testBuildEvaluatorFunction() {
     let pattern = Pattern(
       terms: [
         .named("lhs"),
@@ -14,11 +14,13 @@ class PatternTests: XCTestCase {
       id: 0
     )
 
-    let expected = 
-      "fileprivate func eval0AddTerm(lhs: Parser.LhsType, rhs: Parser.RhsType) -> Parser.AddTermType {\n" +
-      "  return rhs + lhs\n" +
-      "}\n"
-    XCTAssertEqual(pattern.buildEvaluatorString(ruleName:"addTerm"), expected)
+    let expected = """
+        fileprivate func eval0AddTerm(lhs: Parser.LhsType, rhs: Parser.RhsType) -> Parser.AddTermType {
+          return rhs + lhs
+        }
+
+      """
+    XCTAssertEqual(pattern.buildEvaluatorFunction(ruleName:"addTerm"), expected)
   }
 
   func testBuildEvaluatorCall() {

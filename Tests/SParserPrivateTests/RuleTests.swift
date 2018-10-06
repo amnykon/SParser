@@ -34,42 +34,42 @@ class RuleTests: XCTestCase {
       ]
     )
 
-    let expected = [
-      "fileprivate func eval0Name() -> Parser.NameType {\n",
-      "  return quote1\n",
-      "}\n",
-      "\n",
-      "fileprivate func eval1Name() -> Parser.NameType {\n",
-      "  return quote2\n",
-      "}\n",
-      "\n",
-      "fileprivate func eval2Name(name1: Parser.Name1Type) -> Parser.NameType {\n",
-      "  return []\n",
-      "}\n",
-      "\n",
-      "extension Parser {\n",
-      "  public typealias NameType = type\n",
-      "  private func recursivelyRead(name: NameType) throws -> NameType? {\n",
-      "    return name\n",
-      "  }\n",
-      "  public func readName() throws -> NameType? {\n",
-      "    if matches(string: \"quote\") {\n",
-      "      if matches(string: \"quote1\") {\n",
-      "        return try recursivelyRead(name: eval0Name())\n",
-      "      }\n",
-      "      if matches(string: \"quote2\") {\n",
-      "        return try recursivelyRead(name: eval1Name())\n",
-      "      }\n",
-      "      try throwError(message:\"error parsing name. expect \\\"quote1\\\", \\\"quote2\\\"\")\n",
-      "    }\n",
-      "    if let name1 = try readName1() {\n",
-      "      return try recursivelyRead(name: eval2Name(name1: name1))\n",
-      "    }\n",
-      "    return nil\n",
-      "  }\n",
-      "}\n",
-    ].joined()
-    XCTAssertEqual(rule.buildString(), expected)
+    let expected = """
+      public typealias NameType = type
+      public func readName() throws -> NameType? {
+        if matches(string: "quote") {
+          if matches(string: "quote1") {
+            return try recursivelyRead(name: eval0Name())
+          }
+          if matches(string: "quote2") {
+            return try recursivelyRead(name: eval1Name())
+          }
+          try throwError(message:"error parsing name. expect \\"quote1\\", \\"quote2\\"")
+        }
+        if let name1 = try readName1() {
+          return try recursivelyRead(name: eval2Name(name1: name1))
+        }
+        return nil
+      }
+
+      private func recursivelyRead(name: NameType) throws -> NameType? {
+        return name
+      }
+
+      fileprivate func eval0Name() -> Parser.NameType {
+        return quote1
+      }
+
+      fileprivate func eval1Name() -> Parser.NameType {
+        return quote2
+      }
+
+      fileprivate func eval2Name(name1: Parser.Name1Type) -> Parser.NameType {
+        return []
+      }
+
+    """
+        XCTAssertEqual(rule.buildString(), expected)
   }
 }
 

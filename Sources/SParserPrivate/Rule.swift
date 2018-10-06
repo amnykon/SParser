@@ -32,17 +32,14 @@ public struct Rule {
     }
     recursiveTermNode.isRecursive = true
 
-    return [
-      patterns.map{$0.buildEvaluatorString(ruleName: name)}.joined(separator: "\n"),
-      "\n",
-      "extension Parser {\n",
-      "  public typealias \(name.capitalizedFirstLetter())Type = \(type)\n",
-      "  private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type? {\n",
-      recursiveTermNode.buildString(ruleName: name, indent: "  "),
-      "  public func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type? {\n",
-      rootTermNode.buildString(ruleName: name, indent: "  "),
-      "}\n",
-    ].joined()
+    return """
+        public typealias \(name.capitalizedFirstLetter())Type = \(type)
+        public func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type? {
+      \(rootTermNode.buildString(ruleName: name, indent: "  "))
+        private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type? {
+      \(recursiveTermNode.buildString(ruleName: name, indent: "  "))
+      \(patterns.map{$0.buildEvaluatorFunction(ruleName: name)}.joined(separator: "\n"))
+      """
   }
 }
 

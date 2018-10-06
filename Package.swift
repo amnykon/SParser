@@ -5,7 +5,7 @@ let package = Package(
   name: "SParser",
   products: [
     .executable(name: "SParser", targets: ["SParser"]),
-    .library(name: "SParserLibs", targets: ["SParserLibs"]),
+    .library(name: "SParserLibs", type: .static, targets: ["SParserLibs"]),
   ],
   targets: [
     .target(
@@ -22,6 +22,14 @@ let package = Package(
     ),
     .target(
       name: "SParserLibs"
+    ),
+    .testTarget(
+      name: "SParserLibsTests",
+      dependencies: ["SParserLibs"]
+    ),
+    .testTarget(
+      name: "SParserPrivateTests",
+      dependencies: ["SParserPrivate"]
     ),
   ]
 )
