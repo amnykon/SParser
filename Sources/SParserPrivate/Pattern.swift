@@ -16,7 +16,7 @@ public struct Pattern {
       }
     }.joined(separator: ", ")
     return 
-      "  fileprivate func eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)) -> Parser.\(ruleName.capitalizedFirstLetter())Type {\n" +
+      "  fileprivate func eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)) -> \(ruleName.capitalizedFirstLetter())Type {\n" +
       "    \(evaluator)\n" +
       "  }\n"
   }
