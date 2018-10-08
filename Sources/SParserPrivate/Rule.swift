@@ -2,7 +2,7 @@ public struct Rule {
   public let name: String
   public let type: String
   public let patterns: [Pattern]
-  
+
   public func buildString() -> String {
     /* build TermNode */
     let rootTermNode = TermNode(term: nil)
@@ -38,7 +38,7 @@ public struct Rule {
       \(rootTermNode.buildString(ruleName: name, indent: "  "))
         private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type? {
       \(recursiveTermNode.buildString(ruleName: name, indent: "  "))
-      \(patterns.map{$0.buildEvaluatorFunction(ruleName: name)}.joined(separator: "\n"))
+      \(patterns.map{$0.buildEvaluatorFunction(ruleName: name)}.joined())
       """
   }
 }

@@ -51,20 +51,16 @@ class RuleTests: XCTestCase {
         }
         return nil
       }
-
       private func recursivelyRead(name: NameType) throws -> NameType? {
         return name
       }
-
-      fileprivate func eval0Name() -> Parser.NameType {
+      fileprivate func eval0Name() -> NameType {
         return quote1
       }
-
-      fileprivate func eval1Name() -> Parser.NameType {
+      fileprivate func eval1Name() -> NameType {
         return quote2
       }
-
-      fileprivate func eval2Name(name1: Parser.Name1Type) -> Parser.NameType {
+      fileprivate func eval2Name(name1: Name1Type) -> NameType {
         return []
       }
 

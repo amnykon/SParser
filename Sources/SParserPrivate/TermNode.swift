@@ -10,24 +10,24 @@ class TermNode {
   }
 
   func buildString(ruleName: String, indent: String) -> String {
-    let evaluatorCall: String = {
-      guard let pattern = pattern else {
-        if isRecursive {
-          return indent + "  return \(ruleName)\n"
-        }
-        if isRoot {
-          return indent + "  return nil\n"
-        }
-        return indent + "  try throwError(message:\"error parsing \(ruleName). expect \(children.compactMap{$0.term?.getName()}.joined(separator: ", "))\")\n"
-      }
-      return indent + "  " + pattern.buildEvaluatorCall(ruleName: ruleName)
-    }()
-    return [
-      isRecursive ? "" : term != nil ? indent + "if \(term?.buildConditionString() ?? "") {\n" : "",
-      children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ")}.joined(),
-      evaluatorCall,
-      indent + "}\n"
-    ].joined()
+
+    let recursiveHandlers: String = isRecursive || term == nil ? "" : indent + "if \(term?.buildConditionString() ?? "") {\n"
+
+    let childHandlers: String =
+      (children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ")} + [""]).joined(separator: "\n")
+
+    let evaluatorCall: String
+    if let pattern = pattern {
+      evaluatorCall = "\(indent)  \(pattern.buildEvaluatorCall(ruleName: ruleName))"
+    } else if isRecursive {
+      evaluatorCall = "\(indent)  return \(ruleName)\n"
+    } else if isRoot {
+      evaluatorCall = "\(indent)  return nil\n"
+    } else {
+      evaluatorCall = "\(indent)  try throwError(message:\"error parsing \(ruleName). expect \(children.compactMap{$0.term?.getName()}.joined(separator: ", "))\")\n"
+    }
+
+    return "\(recursiveHandlers)\(childHandlers)\(evaluatorCall)\(indent)}"
   }
 
   init(term: Term?, pattern: Pattern? = nil) {

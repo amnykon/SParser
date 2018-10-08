@@ -15,7 +15,7 @@ class PatternTests: XCTestCase {
     )
 
     let expected = """
-        fileprivate func eval0AddTerm(lhs: Parser.LhsType, rhs: Parser.RhsType) -> Parser.AddTermType {
+        fileprivate func eval0AddTerm(lhs: LhsType, rhs: RhsType) -> AddTermType {
           return rhs + lhs
         }
 

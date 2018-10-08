@@ -12,10 +12,10 @@ public struct Pattern {
       case .quoted:
         return nil
       case let .named(name):
-        return "\(name): Parser.\(name.capitalizedFirstLetter())Type"
+        return "\(name): \(name.capitalizedFirstLetter())Type"
       }
     }.joined(separator: ", ")
-    return 
+    return
       "  fileprivate func eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)) -> \(ruleName.capitalizedFirstLetter())Type {\n" +
       "    \(evaluator)\n" +
       "  }\n"
