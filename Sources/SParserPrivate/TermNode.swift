@@ -9,12 +9,12 @@ class TermNode {
     return term == nil
   }
 
-  func buildString(ruleName: String, indent: String) -> String {
-
-    let recursiveHandlers: String = isRecursive || term == nil ? "" : indent + "if \(term?.buildConditionString() ?? "") {\n"
+  func buildString(ruleName: String, indent: String, usedTermNames: Set<String> = Set()) -> String {
+    var usedTermNames = usedTermNames
+    let condition: String = isRecursive || term == nil ? "" : indent + "if \(term?.buildConditionString(usedTermNames: &usedTermNames) ?? "") {\n"
 
     let childHandlers: String =
-      (children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ")} + [""]).joined(separator: "\n")
+      (children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ", usedTermNames: usedTermNames)} + [""]).joined(separator: "\n")
 
     let evaluatorCall: String
     if let pattern = pattern {
@@ -27,7 +27,7 @@ class TermNode {
       evaluatorCall = "\(indent)  try throwError(message:\"error parsing \(ruleName). expect \(children.compactMap{$0.term?.getName()}.joined(separator: ", "))\")\n"
     }
 
-    return "\(recursiveHandlers)\(childHandlers)\(evaluatorCall)\(indent)}"
+    return "\(condition)\(childHandlers)\(evaluatorCall)\(indent)}"
   }
 
   init(term: Term?, pattern: Pattern? = nil) {

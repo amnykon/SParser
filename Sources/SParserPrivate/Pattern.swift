@@ -6,13 +6,21 @@ public struct Pattern {
   public let id: Int
 
   func buildEvaluatorFunction(ruleName: String) -> String {
+    var usedTermNames: Set<String> = Set()
     let termsString = terms.compactMap{
       (term)->String? in
       switch term {
       case .quoted:
         return nil
       case let .named(name):
-        return "\(name): \(name.capitalizedFirstLetter())Type"
+        var modifiedName = name
+        var i = 1
+        while usedTermNames.contains(modifiedName) {
+          modifiedName = "\(name)\(i)"
+          i += 1
+        }
+        usedTermNames.insert(modifiedName)
+        return "\(modifiedName): \(name.capitalizedFirstLetter())Type"
       case .indent:
         return nil
       case .dedent:
@@ -26,13 +34,21 @@ public struct Pattern {
   }
 
   func buildEvaluatorCall(ruleName: String) -> String {
+    var usedTermNames: Set<String> = Set()
     let termsString = terms.compactMap{
       (term)->String? in
       switch term {
       case .quoted:
         return nil
       case let .named(name):
-        return "\(name): \(name)"
+        var modifiedName = name
+        var i = 1
+        while usedTermNames.contains(modifiedName) {
+          modifiedName = "\(name)\(i)"
+          i += 1
+        }
+        usedTermNames.insert(modifiedName)
+        return "\(modifiedName): \(modifiedName)"
       case .indent:
         return nil
       case .dedent:
