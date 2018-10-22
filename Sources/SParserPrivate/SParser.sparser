@@ -64,6 +64,10 @@ terms
 term
   type
     Term
+  ::= "indent"
+    return .indent
+  ::= "dedent"
+    return .dedent
   ::= name
     return .named(name)
   ::= quotedString

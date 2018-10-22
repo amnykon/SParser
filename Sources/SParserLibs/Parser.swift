@@ -193,7 +193,7 @@ public class Parser {
   }
 
   public typealias IndentType = Bool
-  public func readIndent() throws -> IndentType? {
+  public func readIndent() -> IndentType {
     if status == .none {
       save {
         _ = readChar()
@@ -208,11 +208,11 @@ public class Parser {
       status = .none
       return true
     }
-    return nil
+    return false
   }
 
   public typealias DedentType = Bool
-  public func readDedent() throws -> DedentType? {
+  public func readDedent() -> DedentType {
     if status == .none {
       save {
         _ = readChar()
@@ -227,7 +227,7 @@ public class Parser {
       status = .none
       return true
     }
-    return nil
+    return false
   }
 
   public func throwError(message: String) throws {

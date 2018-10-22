@@ -13,6 +13,10 @@ public struct Pattern {
         return nil
       case let .named(name):
         return "\(name): \(name.capitalizedFirstLetter())Type"
+      case .indent:
+        return nil
+      case .dedent:
+        return nil
       }
     }.joined(separator: ", ")
     return
@@ -29,6 +33,10 @@ public struct Pattern {
         return nil
       case let .named(name):
         return "\(name): \(name)"
+      case .indent:
+        return nil
+      case .dedent:
+        return nil
       }
     }.joined(separator: ", ")
     return "return try recursivelyRead(\(ruleName): eval\(id)\(ruleName.capitalizedFirstLetter())(\(termsString)))\n"

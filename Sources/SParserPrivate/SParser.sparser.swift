@@ -1,18 +1,8 @@
 import Foundation
 import SParserLibs
-fileprivate func eval0Syntax(importRule: Parser.ImportRuleType, rules: Parser.RulesType) -> Parser.SyntaxType {
-  return Syntax(imports: importRule, rules: rules)
-}
-
-fileprivate func eval1Syntax(rules: Parser.RulesType) -> Parser.SyntaxType {
-  return Syntax(imports: [], rules: rules)
-}
 
 extension Parser {
   public typealias SyntaxType = Syntax
-  private func recursivelyRead(syntax: SyntaxType) throws -> SyntaxType? {
-    return syntax
-  }
   public func readSyntax() throws -> SyntaxType? {
     if let importRule = try readImportRule() {
       if let rules = try readRules() {
@@ -25,47 +15,40 @@ extension Parser {
     }
     return nil
   }
-}
-
-fileprivate func eval0ImportRule(indent: Parser.IndentType, imports: Parser.ImportsType, dedent: Parser.DedentType) -> Parser.ImportRuleType {
-  return imports
-}
-
-extension Parser {
-  public typealias ImportRuleType = [String]
-  private func recursivelyRead(importRule: ImportRuleType) throws -> ImportRuleType? {
-    return importRule
+  private func recursivelyRead(syntax: SyntaxType) throws -> SyntaxType? {
+    return syntax
   }
+  fileprivate func eval0Syntax(importRule: ImportRuleType, rules: RulesType) -> SyntaxType {
+    return Syntax(imports: importRule, rules: rules)
+  }
+  fileprivate func eval1Syntax(rules: RulesType) -> SyntaxType {
+    return Syntax(imports: [], rules: rules)
+  }
+
+  public typealias ImportRuleType = [String]
   public func readImportRule() throws -> ImportRuleType? {
     if matches(string: "imports\n") {
-      if let indent = try readIndent() {
+      if readIndent() {
         if let imports = try readImports() {
-          if let dedent = try readDedent() {
-            return try recursivelyRead(importRule: eval0ImportRule(indent: indent, imports: imports, dedent: dedent))
+          if readDedent() {
+            return try recursivelyRead(importRule: eval0ImportRule(imports: imports))
           }
-          try throwError(message:"error parsing importRule. expect dedent")
+          try throwError(message:"error parsing importRule. expect ")
         }
         try throwError(message:"error parsing importRule. expect imports")
       }
-      try throwError(message:"error parsing importRule. expect indent")
+      try throwError(message:"error parsing importRule. expect ")
     }
     return nil
   }
-}
-
-fileprivate func eval0Imports(importFramework: Parser.ImportFrameworkType, imports: Parser.ImportsType) -> Parser.ImportsType {
-  return [importFramework] + imports
-}
-
-fileprivate func eval1Imports() -> Parser.ImportsType {
-  return []
-}
-
-extension Parser {
-  public typealias ImportsType = [String]
-  private func recursivelyRead(imports: ImportsType) throws -> ImportsType? {
+  private func recursivelyRead(importRule: ImportRuleType) throws -> ImportRuleType? {
+    return importRule
+  }
+  fileprivate func eval0ImportRule(imports: ImportsType) -> ImportRuleType {
     return imports
   }
+
+  public typealias ImportsType = [String]
   public func readImports() throws -> ImportsType? {
     if let importFramework = try readImportFramework() {
       if let imports = try readImports() {
@@ -75,134 +58,117 @@ extension Parser {
     }
     return try recursivelyRead(imports: eval1Imports())
   }
-}
-
-fileprivate func eval0ImportFramework(line: Parser.LineType) -> Parser.ImportFrameworkType {
-  return line
-}
-
-extension Parser {
-  public typealias ImportFrameworkType = String
-  private func recursivelyRead(importFramework: ImportFrameworkType) throws -> ImportFrameworkType? {
-    return importFramework
+  private func recursivelyRead(imports: ImportsType) throws -> ImportsType? {
+    return imports
   }
+  fileprivate func eval0Imports(importFramework: ImportFrameworkType, imports: ImportsType) -> ImportsType {
+    return [importFramework] + imports
+  }
+  fileprivate func eval1Imports() -> ImportsType {
+    return []
+  }
+
+  public typealias ImportFrameworkType = String
   public func readImportFramework() throws -> ImportFrameworkType? {
     if let line = try readLine() {
       return try recursivelyRead(importFramework: eval0ImportFramework(line: line))
     }
     return nil
   }
-}
+  private func recursivelyRead(importFramework: ImportFrameworkType) throws -> ImportFrameworkType? {
+    return importFramework
+  }
+  fileprivate func eval0ImportFramework(line: LineType) -> ImportFrameworkType {
+    return line
+  }
 
-fileprivate func eval0Rules(rules: Parser.RulesType, rule: Parser.RuleType) -> Parser.RulesType {
-  return rules + [rule]
-}
-
-fileprivate func eval1Rules() -> Parser.RulesType {
-  return []
-}
-
-extension Parser {
   public typealias RulesType = [Rule]
+  public func readRules() throws -> RulesType? {
+    return try recursivelyRead(rules: eval1Rules())
+  }
   private func recursivelyRead(rules: RulesType) throws -> RulesType? {
     if let rule = try readRule() {
       return try recursivelyRead(rules: eval0Rules(rules: rules, rule: rule))
     }
     return rules
   }
-  public func readRules() throws -> RulesType? {
-    return try recursivelyRead(rules: eval1Rules())
+  fileprivate func eval0Rules(rules: RulesType, rule: RuleType) -> RulesType {
+    return rules + [rule]
   }
-}
+  fileprivate func eval1Rules() -> RulesType {
+    return []
+  }
 
-fileprivate func eval0Rule(name: Parser.NameType, indent: Parser.IndentType, type: Parser.TypeType, patterns: Parser.PatternsType, dedent: Parser.DedentType) -> Parser.RuleType {
-  return Rule(name: name, type: type, patterns: patterns)
-}
-
-extension Parser {
   public typealias RuleType = Rule
-  private func recursivelyRead(rule: RuleType) throws -> RuleType? {
-    return rule
-  }
   public func readRule() throws -> RuleType? {
     if let name = try readName() {
       if matches(string: "\n") {
-        if let indent = try readIndent() {
+        if readIndent() {
           if let type = try readType() {
             if let patterns = try readPatterns() {
-              if let dedent = try readDedent() {
-                return try recursivelyRead(rule: eval0Rule(name: name, indent: indent, type: type, patterns: patterns, dedent: dedent))
+              if readDedent() {
+                return try recursivelyRead(rule: eval0Rule(name: name, type: type, patterns: patterns))
               }
-              try throwError(message:"error parsing rule. expect dedent")
+              try throwError(message:"error parsing rule. expect ")
             }
             try throwError(message:"error parsing rule. expect patterns")
           }
           try throwError(message:"error parsing rule. expect type")
         }
-        try throwError(message:"error parsing rule. expect indent")
+        try throwError(message:"error parsing rule. expect ")
       }
       try throwError(message:"error parsing rule. expect \"\n\"")
     }
     return nil
   }
-}
-
-fileprivate func eval0Type(indent: Parser.IndentType, line: Parser.LineType, dedent: Parser.DedentType) -> Parser.TypeType {
-  return line
-}
-
-extension Parser {
-  public typealias TypeType = String
-  private func recursivelyRead(type: TypeType) throws -> TypeType? {
-    return type
+  private func recursivelyRead(rule: RuleType) throws -> RuleType? {
+    return rule
   }
+  fileprivate func eval0Rule(name: NameType, type: TypeType, patterns: PatternsType) -> RuleType {
+    return Rule(name: name, type: type, patterns: patterns)
+  }
+
+  public typealias TypeType = String
   public func readType() throws -> TypeType? {
     if matches(string: "type\n") {
-      if let indent = try readIndent() {
+      if readIndent() {
         if let line = try readLine() {
-          if let dedent = try readDedent() {
-            return try recursivelyRead(type: eval0Type(indent: indent, line: line, dedent: dedent))
+          if readDedent() {
+            return try recursivelyRead(type: eval0Type(line: line))
           }
-          try throwError(message:"error parsing type. expect dedent")
+          try throwError(message:"error parsing type. expect ")
         }
         try throwError(message:"error parsing type. expect line")
       }
-      try throwError(message:"error parsing type. expect indent")
+      try throwError(message:"error parsing type. expect ")
     }
     return nil
   }
-}
+  private func recursivelyRead(type: TypeType) throws -> TypeType? {
+    return type
+  }
+  fileprivate func eval0Type(line: LineType) -> TypeType {
+    return line
+  }
 
-fileprivate func eval0Patterns(patterns: Parser.PatternsType, pattern: Parser.PatternType) -> Parser.PatternsType {
-  return patterns + [Pattern(terms: pattern.terms, evaluator: pattern.evaluator, id: patterns.count)]
-}
-
-fileprivate func eval1Patterns() -> Parser.PatternsType {
-  return []
-}
-
-extension Parser {
   public typealias PatternsType = [Pattern]
+  public func readPatterns() throws -> PatternsType? {
+    return try recursivelyRead(patterns: eval1Patterns())
+  }
   private func recursivelyRead(patterns: PatternsType) throws -> PatternsType? {
     if let pattern = try readPattern() {
       return try recursivelyRead(patterns: eval0Patterns(patterns: patterns, pattern: pattern))
     }
     return patterns
   }
-  public func readPatterns() throws -> PatternsType? {
-    return try recursivelyRead(patterns: eval1Patterns())
+  fileprivate func eval0Patterns(patterns: PatternsType, pattern: PatternType) -> PatternsType {
+    return patterns + [Pattern(terms: pattern.terms, evaluator: pattern.evaluator, id: patterns.count)]
   }
-}
+  fileprivate func eval1Patterns() -> PatternsType {
+    return []
+  }
 
-fileprivate func eval0Pattern(cws: Parser.CwsType, terms: Parser.TermsType, multiLineString: Parser.MultiLineStringType) -> Parser.PatternType {
-  return Pattern(terms: terms, evaluator: multiLineString, id: 0)
-}
-
-extension Parser {
   public typealias PatternType = Pattern
-  private func recursivelyRead(pattern: PatternType) throws -> PatternType? {
-    return pattern
-  }
   public func readPattern() throws -> PatternType? {
     if matches(string: "::=") {
       if let cws = try readCws() {
@@ -221,21 +187,14 @@ extension Parser {
     }
     return nil
   }
-}
-
-fileprivate func eval0Terms(term: Parser.TermType, cws: Parser.CwsType, terms: Parser.TermsType) -> Parser.TermsType {
-  return [term] + terms
-}
-
-fileprivate func eval1Terms() -> Parser.TermsType {
-  return []
-}
-
-extension Parser {
-  public typealias TermsType = [Term]
-  private func recursivelyRead(terms: TermsType) throws -> TermsType? {
-    return terms
+  private func recursivelyRead(pattern: PatternType) throws -> PatternType? {
+    return pattern
   }
+  fileprivate func eval0Pattern(cws: CwsType, terms: TermsType, multiLineString: MultiLineStringType) -> PatternType {
+    return Pattern(terms: terms, evaluator: multiLineString, id: 0)
+  }
+
+  public typealias TermsType = [Term]
   public func readTerms() throws -> TermsType? {
     if let term = try readTerm() {
       if let cws = try readCws() {
@@ -248,42 +207,49 @@ extension Parser {
     }
     return try recursivelyRead(terms: eval1Terms())
   }
-}
-
-fileprivate func eval0Term(name: Parser.NameType) -> Parser.TermType {
-  return .named(name)
-}
-
-fileprivate func eval1Term(quotedString: Parser.QuotedStringType) -> Parser.TermType {
-  return .quoted(quotedString)
-}
-
-extension Parser {
-  public typealias TermType = Term
-  private func recursivelyRead(term: TermType) throws -> TermType? {
-    return term
+  private func recursivelyRead(terms: TermsType) throws -> TermsType? {
+    return terms
   }
+  fileprivate func eval0Terms(term: TermType, cws: CwsType, terms: TermsType) -> TermsType {
+    return [term] + terms
+  }
+  fileprivate func eval1Terms() -> TermsType {
+    return []
+  }
+
+  public typealias TermType = Term
   public func readTerm() throws -> TermType? {
+    if matches(string: "indent") {
+      return try recursivelyRead(term: eval0Term())
+    }
+    if matches(string: "dedent") {
+      return try recursivelyRead(term: eval1Term())
+    }
     if let name = try readName() {
-      return try recursivelyRead(term: eval0Term(name: name))
+      return try recursivelyRead(term: eval2Term(name: name))
     }
     if let quotedString = try readQuotedString() {
-      return try recursivelyRead(term: eval1Term(quotedString: quotedString))
+      return try recursivelyRead(term: eval3Term(quotedString: quotedString))
     }
     return nil
   }
-}
-
-fileprivate func eval0Name(letter: Parser.LetterType, letterDigits: Parser.LetterDigitsType) -> Parser.NameType {
-  return String(letter) + letterDigits
-
-}
-
-extension Parser {
-  public typealias NameType = String
-  private func recursivelyRead(name: NameType) throws -> NameType? {
-    return name
+  private func recursivelyRead(term: TermType) throws -> TermType? {
+    return term
   }
+  fileprivate func eval0Term() -> TermType {
+    return .indent
+  }
+  fileprivate func eval1Term() -> TermType {
+    return .dedent
+  }
+  fileprivate func eval2Term(name: NameType) -> TermType {
+    return .named(name)
+  }
+  fileprivate func eval3Term(quotedString: QuotedStringType) -> TermType {
+    return .quoted(quotedString)
+  }
+
+  public typealias NameType = String
   public func readName() throws -> NameType? {
     if let letter = try readLetter() {
       if let letterDigits = try readLetterDigits() {
@@ -292,5 +258,12 @@ extension Parser {
       try throwError(message:"error parsing name. expect letterDigits")
     }
     return nil
+  }
+  private func recursivelyRead(name: NameType) throws -> NameType? {
+    return name
+  }
+  fileprivate func eval0Name(letter: LetterType, letterDigits: LetterDigitsType) -> NameType {
+    return String(letter) + letterDigits
+
   }
 }
