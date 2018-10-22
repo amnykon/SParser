@@ -54,7 +54,7 @@ extension Parser {
     }
     isConvertingIndents = true
 
-    if try readIndent() != true {
+    if readIndent() != true {
       return nil
     }
 
@@ -62,7 +62,7 @@ extension Parser {
     var string = ""
     var prevCharWasNewline = false
     while(true) {
-      if try readDedent() == true {
+      if readDedent() == true {
         return string
       }
       switch readChar() {
