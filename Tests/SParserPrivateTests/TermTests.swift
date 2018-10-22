@@ -7,12 +7,14 @@ class TermTests: XCTestCase {
     let term = Term.named("number")
 
     let expected = "let number = try readNumber()"
-    XCTAssertEqual(term.buildConditionString(), expected)
+    var usedTermNames = Set<String>()
+    XCTAssertEqual(term.buildConditionString(usedTermNames: &usedTermNames), expected)
   }
   func testQuotedBuildConditionString() {
     let term = Term.quoted("+")
 
     let expected = "matches(string: \"+\")"
-    XCTAssertEqual(term.buildConditionString(), expected)
+    var usedTermNames = Set<String>()
+    XCTAssertEqual(term.buildConditionString(usedTermNames: &usedTermNames), expected)
   }
 }
