@@ -1,10 +1,10 @@
-public struct Rule {
-  public let name: String
-  public let accessLevel: AccessLevel
-  public let type: String
-  public let patterns: [Pattern]
+struct Rule {
+  let name: String
+  let accessLevel: AccessLevel
+  let type: String
+  let patterns: [Pattern]
 
-  public func buildString() -> String {
+  func buildString() -> String {
     /* build TermNode */
     let rootTermNode = TermNode(term: nil)
     for pattern in patterns {

@@ -1,6 +1,6 @@
 public struct Syntax {
-  public let imports: [String]
-  public let rules: [Rule]
+  let imports: [String]
+  let rules: [Rule]
 
   public func buildString() -> String {
     return """

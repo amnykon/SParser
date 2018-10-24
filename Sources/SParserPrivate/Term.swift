@@ -1,10 +1,10 @@
-public enum Term {
+enum Term {
   case type(name: String?, type:String)
   case quoted(String)
   case indent
   case dedent
 
-  public func getTypeName() -> String {
+  func getTypeName() -> String {
     switch self {
       case let .type(_, type):
         return "\(type.capitalizedFirstLetter())Type"
@@ -53,7 +53,7 @@ public enum Term {
     }
   }
 
-  public func buildConditionString(takenTermNames: inout Set<String>) -> String {
+  func buildConditionString(takenTermNames: inout Set<String>) -> String {
     switch self {
       case let .type(_, type):
         return "let \(getNodeName(takenTermNames: &takenTermNames)) = try read\(type.capitalizedFirstLetter())()"

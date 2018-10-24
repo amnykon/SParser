@@ -1,9 +1,9 @@
 import Foundation
 
-public struct Pattern {
-  public let terms: [Term]
-  public let evaluator: String
-  public let id: Int
+struct Pattern {
+  let terms: [Term]
+  let evaluator: String
+  let id: Int
 
   func buildEvaluatorFunction(ruleName: String) -> String {
     var usedTermNames: Set<String> = Set()
