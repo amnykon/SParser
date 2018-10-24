@@ -8,7 +8,7 @@ extension Parser {
       if let rules = try readRules() {
         return try recursivelyRead(syntax: eval0Syntax(importRule: importRule, rules: rules))
       }
-      try throwError(message:"error parsing syntax. expect rules")
+      try throwError(message:"error parsing syntax. expect RulesType")
     }
     if let rules = try readRules() {
       return try recursivelyRead(syntax: eval1Syntax(rules: rules))
@@ -35,7 +35,7 @@ extension Parser {
           }
           try throwError(message:"error parsing importRule. expect ")
         }
-        try throwError(message:"error parsing importRule. expect imports")
+        try throwError(message:"error parsing importRule. expect ImportsType")
       }
       try throwError(message:"error parsing importRule. expect ")
     }
@@ -54,7 +54,7 @@ extension Parser {
       if let imports = try readImports() {
         return try recursivelyRead(imports: eval0Imports(importFramework: importFramework, imports: imports))
       }
-      try throwError(message:"error parsing imports. expect imports")
+      try throwError(message:"error parsing imports. expect ImportsType")
     }
     return try recursivelyRead(imports: eval1Imports())
   }
@@ -111,9 +111,9 @@ extension Parser {
               }
               try throwError(message:"error parsing rule. expect ")
             }
-            try throwError(message:"error parsing rule. expect patterns")
+            try throwError(message:"error parsing rule. expect PatternsType")
           }
-          try throwError(message:"error parsing rule. expect type")
+          try throwError(message:"error parsing rule. expect TypeType")
         }
         try throwError(message:"error parsing rule. expect ")
       }
@@ -138,7 +138,7 @@ extension Parser {
           }
           try throwError(message:"error parsing type. expect ")
         }
-        try throwError(message:"error parsing type. expect line")
+        try throwError(message:"error parsing type. expect LineType")
       }
       try throwError(message:"error parsing type. expect ")
     }
@@ -177,13 +177,13 @@ extension Parser {
             if let multiLineString = try readMultiLineString() {
               return try recursivelyRead(pattern: eval0Pattern(cws: cws, terms: terms, multiLineString: multiLineString))
             }
-            try throwError(message:"error parsing pattern. expect multiLineString")
+            try throwError(message:"error parsing pattern. expect MultiLineStringType")
           }
           try throwError(message:"error parsing pattern. expect \"\n\"")
         }
-        try throwError(message:"error parsing pattern. expect terms")
+        try throwError(message:"error parsing pattern. expect TermsType")
       }
-      try throwError(message:"error parsing pattern. expect cws")
+      try throwError(message:"error parsing pattern. expect CwsType")
     }
     return nil
   }
@@ -201,9 +201,9 @@ extension Parser {
         if let terms = try readTerms() {
           return try recursivelyRead(terms: eval0Terms(term: term, cws: cws, terms: terms))
         }
-        try throwError(message:"error parsing terms. expect terms")
+        try throwError(message:"error parsing terms. expect TermsType")
       }
-      try throwError(message:"error parsing terms. expect cws")
+      try throwError(message:"error parsing terms. expect CwsType")
     }
     return try recursivelyRead(terms: eval1Terms())
   }
@@ -226,10 +226,16 @@ extension Parser {
       return try recursivelyRead(term: eval1Term())
     }
     if let name = try readName() {
+      if matches(string: ":") {
+        if let name1 = try readName() {
+          return try recursivelyRead(term: eval3Term(name: name, name1: name1))
+        }
+        try throwError(message:"error parsing term. expect NameType")
+      }
       return try recursivelyRead(term: eval2Term(name: name))
     }
     if let quotedString = try readQuotedString() {
-      return try recursivelyRead(term: eval3Term(quotedString: quotedString))
+      return try recursivelyRead(term: eval4Term(quotedString: quotedString))
     }
     return nil
   }
@@ -243,9 +249,12 @@ extension Parser {
     return .dedent
   }
   fileprivate func eval2Term(name: NameType) -> TermType {
-    return .named(name)
+    return .type(name: nil, type: name)
   }
-  fileprivate func eval3Term(quotedString: QuotedStringType) -> TermType {
+  fileprivate func eval3Term(name: NameType, name1: NameType) -> TermType {
+    return .type(name: name, type: name1)
+  }
+  fileprivate func eval4Term(quotedString: QuotedStringType) -> TermType {
     return .quoted(quotedString)
   }
 
@@ -255,7 +264,7 @@ extension Parser {
       if let letterDigits = try readLetterDigits() {
         return try recursivelyRead(name: eval0Name(letter: letter, letterDigits: letterDigits))
       }
-      try throwError(message:"error parsing name. expect letterDigits")
+      try throwError(message:"error parsing name. expect LetterDigitsType")
     }
     return nil
   }

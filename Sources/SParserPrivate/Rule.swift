@@ -26,7 +26,7 @@ public struct Rule {
       termNode.pattern = pattern
     }
     var recursiveTermNode = TermNode(term: nil)
-    if let recursiveTermNodeIndex = rootTermNode.children.index(where: {$0.term == .named(name)}) {
+    if let recursiveTermNodeIndex = rootTermNode.children.index(where: {$0.term == .type(name: nil, type: name)}) {
       recursiveTermNode = rootTermNode.children[recursiveTermNodeIndex]
       rootTermNode.children.remove(at: recursiveTermNodeIndex)
     }

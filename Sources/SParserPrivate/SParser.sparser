@@ -68,8 +68,10 @@ term
     return .indent
   ::= "dedent"
     return .dedent
-  ::= name
-    return .named(name)
+  ::= name 
+    return .type(name: nil, type: name)
+  ::= name ":" name
+    return .type(name: name, type: name1)
   ::= quotedString
     return .quoted(quotedString)
 name

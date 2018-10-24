@@ -12,15 +12,8 @@ public struct Pattern {
       switch term {
       case .quoted:
         return nil
-      case let .named(name):
-        var modifiedName = name
-        var i = 1
-        while usedTermNames.contains(modifiedName) {
-          modifiedName = "\(name)\(i)"
-          i += 1
-        }
-        usedTermNames.insert(modifiedName)
-        return "\(modifiedName): \(name.capitalizedFirstLetter())Type"
+      case .type:
+        return "\(term.getName(takenTermNames: &usedTermNames)): \(term.getTypeName())"
       case .indent:
         return nil
       case .dedent:
@@ -35,20 +28,14 @@ public struct Pattern {
 
   func buildEvaluatorCall(ruleName: String) -> String {
     var usedTermNames: Set<String> = Set()
+    var usedTermNodeNames: Set<String> = Set()
     let termsString = terms.compactMap{
       (term)->String? in
       switch term {
       case .quoted:
         return nil
-      case let .named(name):
-        var modifiedName = name
-        var i = 1
-        while usedTermNames.contains(modifiedName) {
-          modifiedName = "\(name)\(i)"
-          i += 1
-        }
-        usedTermNames.insert(modifiedName)
-        return "\(modifiedName): \(modifiedName)"
+      case .type:
+        return "\(term.getName(takenTermNames: &usedTermNames)): \(term.getNodeName(takenTermNames: &usedTermNodeNames))"
       case .indent:
         return nil
       case .dedent:

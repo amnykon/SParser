@@ -1,13 +1,13 @@
 public enum Term {
-  case named(String)
+  case type(name: String?, type:String)
   case quoted(String)
   case indent
   case dedent
 
-  public func getName() -> String {
+  public func getTypeName() -> String {
     switch self {
-      case let .named(name):
-        return name
+      case let .type(_, type):
+        return "\(type.capitalizedFirstLetter())Type"
       case let .quoted(quoted):
         return "\\\"\(quoted)\\\""
       case .indent:
@@ -17,17 +17,46 @@ public enum Term {
     }
   }
 
-  public func buildConditionString(usedTermNames: inout Set<String>) -> String {
+  func getName(takenTermNames: inout Set<String>) -> String {
+     switch self {
+      case let .type(name, _):
+          if let name = name {
+           return name
+         }
+         return getNodeName(takenTermNames: &takenTermNames)
+      case .quoted:
+        return ""
+      case .indent:
+        return ""
+      case .dedent:
+        return ""
+    }
+  }
+
+  func getNodeName(takenTermNames: inout Set<String>) -> String {
+     switch self {
+       case let .type(_, type):
+         var name = type
+         var i = 1
+         while takenTermNames.contains(name) {
+           name = "\(type)\(i)"
+           i += 1
+         }
+         takenTermNames.insert(name)
+         return name 
+      case .quoted:
+        return ""
+      case .indent:
+        return ""
+      case .dedent:
+        return ""
+    }
+  }
+
+  public func buildConditionString(takenTermNames: inout Set<String>) -> String {
     switch self {
-      case let .named(name):
-        var modifiedName = name
-        var i = 1
-        while usedTermNames.contains(modifiedName) {
-          modifiedName = "\(name)\(i)"
-          i += 1
-        }
-        usedTermNames.insert(modifiedName)
-        return "let \(modifiedName ) = try read\(name.capitalizedFirstLetter())()"
+      case let .type(_, type):
+        return "let \(getNodeName(takenTermNames: &takenTermNames)) = try read\(type.capitalizedFirstLetter())()"
       case let .quoted(quoted):
         return "matches(string: \"\(quoted)\")"
       case .indent:
@@ -41,8 +70,8 @@ public enum Term {
 extension Term: Equatable {
   public static func ==(lhs: Term, rhs: Term) -> Bool {
     switch (lhs, rhs) {
-    case (let .named(lhsName), let .named(rhsName)):
-        return lhsName == rhsName
+    case (let .type(_, lhsType), let .type(_, rhsType)):
+        return lhsType == rhsType
     case (let .quoted(lhsString), let .quoted(rhsString)):
         return lhsString == rhsString
     case (.indent, .indent):
