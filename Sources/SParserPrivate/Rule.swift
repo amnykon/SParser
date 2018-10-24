@@ -1,5 +1,6 @@
 public struct Rule {
   public let name: String
+  public let accessLevel: AccessLevel
   public let type: String
   public let patterns: [Pattern]
 
@@ -33,8 +34,8 @@ public struct Rule {
     recursiveTermNode.isRecursive = true
 
     return """
-        public typealias \(name.capitalizedFirstLetter())Type = \(type)
-        public func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type? {
+        \(accessLevel.toString())typealias \(name.capitalizedFirstLetter())Type = \(type)
+        \(accessLevel.toString())func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type? {
       \(rootTermNode.buildString(ruleName: name, indent: "  "))
         private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type? {
       \(recursiveTermNode.buildString(ruleName: name, indent: "  "))

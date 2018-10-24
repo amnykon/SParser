@@ -3,67 +3,73 @@ imports
   SParserLibs
 syntax
   type
-    Syntax
+    public Syntax
   ::= importRule rules
     return Syntax(imports: importRule, rules: rules)
   ::= rules
     return Syntax(imports: [], rules: rules)
 importRule
   type
-    [String]
+    private [String]
   ::= "imports\n" indent imports dedent
     return imports
 imports
   type
-    [String]
+    private [String]
   ::= importFramework imports
     return [importFramework] + imports
   ::=
     return []
 importFramework
   type
-    String
+    private String
   ::= line
     return line
 rules
   type
-    [Rule]
+    private [Rule]
   ::= rules rule
     return rules + [rule]
   ::=
     return []
 rule
   type
-    Rule
-  ::= name "\n" indent type patterns dedent
-    return Rule(name: name, type: type, patterns: patterns)
-type
+    private Rule
+  ::= name "\n" indent "type\n" indent accessLevel type:line dedent patterns dedent
+    return Rule(name: name, accessLevel: accessLevel, type: type, patterns: patterns)
+accessLevel
   type
-    String
-  ::= "type\n" indent line dedent
-    return line
+    private AccessLevel
+  ::= "public "
+    return .public
+  ::= "internal "
+    return .internal
+  ::= "private "
+    return .private
+  ::=
+    return .internal
 patterns
   type
-    [Pattern]
+    private [Pattern]
   ::= patterns pattern
     return patterns + [Pattern(terms: pattern.terms, evaluator: pattern.evaluator, id: patterns.count)]
   ::=
     return []
 pattern
   type
-    Pattern
+    private Pattern
   ::= "::=" cws terms "\n" multiLineString
     return Pattern(terms: terms, evaluator: multiLineString, id: 0)
 terms
   type
-    [Term]
+    private [Term]
   ::= term cws terms
     return [term] + terms
   ::=
     return []
 term
   type
-    Term
+    private Term
   ::= "indent"
     return .indent
   ::= "dedent"
@@ -76,7 +82,7 @@ term
     return .quoted(quotedString)
 name
   type
-    String
+    private String
   ::= letter letterDigits
     return String(letter) + letterDigits
 
