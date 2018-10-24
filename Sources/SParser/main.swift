@@ -2,6 +2,8 @@ import Foundation
 import SParserPrivate
 import SParserLibs
 
+var exitStatus: Int32 = 0
+
 for inFile in CommandLine.arguments.dropFirst() {
   let inUrl = NSURL.fileURL(withPath: inFile)
   let outUrl = NSURL.fileURL(withPath: inFile + ".swift")
@@ -16,20 +18,19 @@ for inFile in CommandLine.arguments.dropFirst() {
   do {
     guard let syntax = try parser.readSyntax() else {
       print("Error1 while reading Syntax") /* TODO make more descriptive */
+      exitStatus = 1
       continue
     }
     try syntax.buildString().write(to: outUrl, atomically: false, encoding: .utf8)
   } catch let error as ParserError {
     print(error.message)
+    exitStatus = 1
     continue
   } catch {
     print("Error while reading Syntax") /* TODO make more descriptive */
+    exitStatus = 1
     continue
   }
 }
 
-/*
-let path = FileManager.default.currentDirectoryPath
-let dirUrl = NSURL.fileURL(withPath: path)
-let fileUrl = dirUrl.appendingPathComponent("testReadChar.txt")
-*/
+exit(exitStatus)
