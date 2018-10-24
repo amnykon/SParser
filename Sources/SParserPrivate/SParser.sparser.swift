@@ -50,9 +50,9 @@ extension Parser {
 
   private typealias ImportsType = [String]
   private func readImports() throws -> ImportsType? {
-    if let importFramework = try readImportFramework() {
+    if let line = try readLine() {
       if let imports = try readImports() {
-        return try recursivelyRead(imports: eval0Imports(importFramework: importFramework, imports: imports))
+        return try recursivelyRead(imports: eval0Imports(importFramework: line, imports: imports))
       }
       try throwError(message:"error parsing imports. expect ImportsType")
     }
@@ -61,25 +61,11 @@ extension Parser {
   private func recursivelyRead(imports: ImportsType) throws -> ImportsType? {
     return imports
   }
-  private func eval0Imports(importFramework: ImportFrameworkType, imports: ImportsType) -> ImportsType {
+  private func eval0Imports(importFramework: LineType, imports: ImportsType) -> ImportsType {
     return [importFramework] + imports
   }
   private func eval1Imports() -> ImportsType {
     return []
-  }
-
-  private typealias ImportFrameworkType = String
-  private func readImportFramework() throws -> ImportFrameworkType? {
-    if let line = try readLine() {
-      return try recursivelyRead(importFramework: eval0ImportFramework(line: line))
-    }
-    return nil
-  }
-  private func recursivelyRead(importFramework: ImportFrameworkType) throws -> ImportFrameworkType? {
-    return importFramework
-  }
-  private func eval0ImportFramework(line: LineType) -> ImportFrameworkType {
-    return line
   }
 
   private typealias RulesType = [Rule]

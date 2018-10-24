@@ -16,15 +16,10 @@ importRule
 imports
   type
     private [String]
-  ::= importFramework imports
+  ::= importFramework:line imports
     return [importFramework] + imports
   ::=
     return []
-importFramework
-  type
-    private String
-  ::= line
-    return line
 rules
   type
     private [Rule]
