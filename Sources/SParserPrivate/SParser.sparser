@@ -4,34 +4,18 @@ imports
 syntax
   type
     public Syntax
-  ::= importRule rules
-    return Syntax(imports: importRule, rules: rules)
-  ::= rules
-    return Syntax(imports: [], rules: rules)
+  ::= importRule? rules:rule*
+    return Syntax(imports: importRule ?? [], rules: rules)
 importRule
   type
     private [String]
-  ::= "imports\n" indent imports dedent
+  ::= "imports\n" indent imports:line+ dedent
     return imports
-imports
-  type
-    private [String]
-  ::= importFramework:line imports
-    return [importFramework] + imports
-  ::=
-    return []
-rules
-  type
-    private [Rule]
-  ::= rules rule
-    return rules + [rule]
-  ::=
-    return []
 rule
   type
     private Rule
-  ::= name "\n" indent "type\n" indent accessLevel type:line dedent patterns dedent
-    return Rule(name: name, accessLevel: accessLevel, type: type, patterns: patterns)
+  ::= name "\n" indent "type\n" indent accessLevel? type:line dedent patterns dedent
+    return Rule(name: name, accessLevel: accessLevel ?? .internal, type: type, patterns: patterns)
 accessLevel
   type
     private AccessLevel
@@ -41,8 +25,6 @@ accessLevel
     return .internal
   ::= "private "
     return .private
-  ::=
-    return .internal
 patterns
   type
     private [Pattern]
@@ -53,28 +35,30 @@ patterns
 pattern
   type
     private Pattern
-  ::= "::=" cws terms "\n" multiLineString
+  ::= "::=" cws terms:term* "\n" multiLineString
     return Pattern(terms: terms, evaluator: multiLineString, id: 0)
-terms
-  type
-    private [Term]
-  ::= term cws terms
-    return [term] + terms
-  ::=
-    return []
 term
   type
     private Term
-  ::= "indent"
+  ::= "indent" cws
     return .indent
-  ::= "dedent"
+  ::= "dedent" cws
     return .dedent
-  ::= name 
-    return .type(name: nil, type: name)
-  ::= name ":" name
-    return .type(name: name, type: name1)
-  ::= quotedString
+  ::= name ":" type:name termModifier? cws
+    return .type(name: name, type: type, modifier: termModifier ?? .one)
+  ::= type:name termModifier? cws
+    return .type(name: nil, type: type, modifier: termModifier ?? .one)
+  ::= quotedString cws
     return .quoted(quotedString)
+termModifier
+  type
+    private TermModifier
+  ::= "?"
+    return .optional
+  ::= "+"
+    return .oneOrMore
+  ::= "*"
+    return .zeroOrMore
 name
   type
     private String

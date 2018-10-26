@@ -11,12 +11,14 @@ class TermNode {
 
   func buildString(ruleName: String, indent: String, takenTermNames: Set<String> = Set()) -> String {
     var takenTermNames = takenTermNames
-    let condition: String = isRecursive || term == nil ? "" : indent + "if \(term?.buildConditionString(takenTermNames: &takenTermNames) ?? "") {\n"
+    let condition: String = isRecursive || term == nil ? "" : "\(indent)\(term?.buildParseCall(takenTermNames: &takenTermNames) ?? "")\n"
 
     let childHandlers: String = (children.map{$0.buildString(ruleName: ruleName, indent: indent + "  ", takenTermNames: takenTermNames)} + [""]).joined(separator: "\n")
 
     let evaluatorCall: String
-    if let pattern = pattern {
+    if children.reduce(false, {$0 || !($1.term?.isConditional ?? true)}) {
+      evaluatorCall = ""
+    } else if let pattern = pattern {
       evaluatorCall = "\(indent)  \(pattern.buildEvaluatorCall(ruleName: ruleName))"
     } else if isRecursive {
       evaluatorCall = "\(indent)  return \(ruleName)\n"

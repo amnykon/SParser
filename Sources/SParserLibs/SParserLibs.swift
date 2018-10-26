@@ -1,5 +1,23 @@
 import Foundation
 extension Parser {
+  public func oneOrMore<T>(_ parse: () throws -> T?) throws -> [T]? {
+    let array = try zeroOrMore(parse)
+    if array.isEmpty {
+      return nil
+    }
+    return array
+  }
+
+  public func zeroOrMore<T>(_ parse: () throws -> T?) throws -> [T] {
+    var array: [T] = []
+    while true {
+      guard let item = try parse() else {
+        return array
+      }
+      array.append(item)
+    }
+  }
+
   public typealias QuotedStringType = String
   public func readQuotedString() throws -> QuotedStringType? {
     var string: String? = ""
