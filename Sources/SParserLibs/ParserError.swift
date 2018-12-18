@@ -1,7 +1,9 @@
 public struct ParserError: Error {
+  public let thrower: Thrower?
   public let message: String
-  public init(message: String) {
+
+  init(thrower: Thrower?, message: String) {
+    self.thrower = thrower
     self.message = message
   }
 }
-

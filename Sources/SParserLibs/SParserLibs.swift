@@ -1,25 +1,34 @@
 import Foundation
 extension Parser {
-  public func oneOrMore<T>(_ parse: () throws -> T?) throws -> [T]? {
-    let array = try zeroOrMore(parse)
+  public func readOneOrMore<T>(_ parse: () throws -> T) throws -> [T] {
+    let array = try readZeroOrMore(parse)
     if array.isEmpty {
-      return nil
+      throw createThrower().createError(message: "error parsing oneOrMore.")
     }
     return array
   }
 
-  public func zeroOrMore<T>(_ parse: () throws -> T?) throws -> [T] {
+  public func readZeroOrMore<T>(_ parse: () throws -> T) throws -> [T] {
     var array: [T] = []
-    while true {
-      guard let item = try parse() else {
-        return array
+    do {
+      while true {
+        array.append(try parse())
       }
-      array.append(item)
+    } catch let error as ParserError where error.thrower != nil {
+      return array
+    }
+  }
+
+  public func readOptional<T>(_ parse: () throws -> T) throws -> T? {
+    do {
+      return try parse()
+    } catch let error as ParserError where error.thrower != nil {
+      return nil
     }
   }
 
   public typealias QuotedStringType = String
-  public func readQuotedString() throws -> QuotedStringType? {
+  public func readQuotedString() throws -> QuotedStringType {
     var string: String? = ""
     save() {
       if readChar() == "\"" {
@@ -38,14 +47,15 @@ extension Parser {
       string = nil
       return .restore
     }
-    return string
+    if let string = string {
+      return string
+    }
+    throw createThrower().createError(message: "error parsing quotedString.")
   }
-}
 
-extension Parser {
   public typealias LineType = String
-  public func readLine() throws -> LineType? {
-    var string: String?  = ""
+  public func readLine() throws -> LineType {
+    var string: String? = ""
     save() {
       while true {
         switch readChar() {
@@ -59,30 +69,35 @@ extension Parser {
         }
       }
     }
-    return string
+    if let string = string {
+      return string
+    }
+    throw createThrower().createError(message: "error parsing line.")
   }
-}
 
-extension Parser {
   public typealias MultiLineStringType = String
-  public func readMultiLineString() throws -> MultiLineStringType? {
+  public func readMultiLineString() throws -> MultiLineStringType {
     let savedIsConveertingIndents = isConvertingIndents
     defer {
       isConvertingIndents = savedIsConveertingIndents
     }
     isConvertingIndents = true
 
-    if readIndent() != true {
-      return nil
+    do {
+      try readIndent()
+    } catch let error as ParserError where error.thrower != nil {
+      throw createThrower().createError(message: "error parsing multiLineString.")
     }
 
     isConvertingIndents = false
     var string = ""
     var prevCharWasNewline = false
     while(true) {
-      if readDedent() == true {
+      do {
+        try readDedent()
         return string
-      }
+      } catch let error as ParserError where error.thrower != nil {}
+
       switch readChar() {
       case "\0":
         /* TODO throw error */
@@ -122,19 +137,17 @@ fileprivate func evalLetterDigits() -> Parser.LetterDigitsType {
 
 extension Parser {
   public typealias LetterDigitsType = String
-  public func readLetterDigits() throws -> LetterDigitsType? {
-    if let letterDigit = try readLetterDigit() {
-      if let letterDigits = try readLetterDigits() {
-        return evalLetterDigits(letterDigit:letterDigit, letterDigits:letterDigits)
-      }
-    }
+  public func readLetterDigits() throws -> LetterDigitsType {
+    do {
+      let letterDigit = try readLetterDigit()
+      let letterDigits = try readLetterDigits()
+      return evalLetterDigits(letterDigit:letterDigit, letterDigits:letterDigits)
+    } catch let error as ParserError where error.thrower != nil {}
     return evalLetterDigits()
   }
-}
 
-extension Parser {
   public typealias LetterDigitType = Character
-  public func readLetterDigit() throws -> LetterDigitType? {
+  public func readLetterDigit() throws -> LetterDigitType {
     var char: Character?
     save() {
       char = readChar()
@@ -148,13 +161,14 @@ extension Parser {
         return .restore
       }
     }
-    return char
+    if let char = char {
+      return char
+    }
+    throw createThrower().createError(message: "error parsing letterDigit.")
   }
-}
 
-extension Parser {
   public typealias LetterType = Character
-  public func readLetter() throws -> LetterType? {
+  public func readLetter() throws -> LetterType {
     var char: Character?
     save() {
       char = readChar()
@@ -169,21 +183,20 @@ extension Parser {
         return .restore
       }
     }
-    return char
+    if let char = char {
+      return char
+    }
+    throw createThrower().createError(message: "error parsing letter.")
   }
-}
 
-extension Parser {
   public typealias CwsType = Bool
-  public func readCws() throws -> CwsType? {
-    _ = try readWs()
+  public func readCws() throws -> CwsType {
+    _ = try? readWs()
     return true
   }
-}
 
-extension Parser {
   public typealias WsType = Bool
-  public func readWs() throws -> WsType? {
+  public func readWs() throws -> WsType {
     var string: String = ""
     while true {
       var hasWsEnded = false
@@ -204,14 +217,12 @@ extension Parser {
         if string != "" {
           return true
         }
-        return nil
+        throw createThrower().createError(message: "error parsing letter.")
       }
     }
   }
-}
 
-extension Parser {
-  public func matches(string: String) -> Bool {
+  public func read(string: String) throws {
     var position = 0
     save() {
       while true {
@@ -225,7 +236,9 @@ extension Parser {
        position += 1
       }
     }
-    return position == string.count
+    if position != string.count {
+      throw createThrower().createError(message: "error parsing string: \(string).")
+    }
   }
 }
 

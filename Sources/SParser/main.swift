@@ -16,11 +16,7 @@ for inFile in CommandLine.arguments.dropFirst() {
   let parser = Parser(stream: inStream)
   parser.isConvertingIndents = true
   do {
-    guard let syntax = try parser.readSyntax() else {
-      print("Error1 while reading Syntax") /* TODO make more descriptive */
-      exitStatus = 1
-      continue
-    }
+    let syntax = try parser.readSyntax()
     try syntax.buildString().write(to: outUrl, atomically: false, encoding: .utf8)
   } catch let error as ParserError {
     print(error.message)

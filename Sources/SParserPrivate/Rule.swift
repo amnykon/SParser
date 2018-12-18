@@ -35,10 +35,12 @@ struct Rule {
 
     return """
         \(accessLevel.toString())typealias \(name.capitalizedFirstLetter())Type = \(type)
-        \(accessLevel.toString())func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type? {
-      \(rootTermNode.buildString(ruleName: name, indent: "  "))
-        private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type? {
-      \(recursiveTermNode.buildString(ruleName: name, indent: "  "))
+        \(accessLevel.toString())func read\(name.capitalizedFirstLetter())() throws -> \(name.capitalizedFirstLetter())Type {
+          let thrower = createThrower()
+      \(rootTermNode.buildString(ruleName: name, indent: "  "))  }
+        private func recursivelyRead(\(name): \(name.capitalizedFirstLetter())Type) throws -> \(name.capitalizedFirstLetter())Type {
+          let thrower = createThrower()
+      \(recursiveTermNode.buildString(ruleName: name, indent: "  "))  }
       \(patterns.map{$0.buildEvaluatorFunction(ruleName: name)}.joined())
       """
   }

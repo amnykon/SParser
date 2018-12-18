@@ -68,32 +68,33 @@ enum Term {
       case .oneOrMore, .one:
         return true
       case .optional, .zeroOrMore:
-        return false
+        return true
       }
     case .quoted, .indent, .dedent:
       return true
     }
   }
 
-  func buildParseCall(takenTermNames: inout Set<String>) -> String {
+  func buildReadCall(takenTermNames: inout Set<String>) -> String {
     switch self {
       case let .type(_, type, modifier):
         switch modifier {
         case .optional:
-          return "do { let \(getNodeName(takenTermNames: &takenTermNames)) = try read\(type.capitalizedFirstLetter())()"
+          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try? read\(type.capitalizedFirstLetter())()"
+          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try readOptional({try read\(type.capitalizedFirstLetter())()})"
         case .oneOrMore:
-          return "if let \(getNodeName(takenTermNames: &takenTermNames)) = try oneOrMore({try read\(type.capitalizedFirstLetter())()}) {"
+          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try readOneOrMore({try read\(type.capitalizedFirstLetter())()})"
         case .zeroOrMore:
-          return "do { let \(getNodeName(takenTermNames: &takenTermNames)) = try zeroOrMore({try read\(type.capitalizedFirstLetter())()})"
+          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try readZeroOrMore({try read\(type.capitalizedFirstLetter())()})"
         case .one:
-          return "if let \(getNodeName(takenTermNames: &takenTermNames)) = try read\(type.capitalizedFirstLetter())() {"
+          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try read\(type.capitalizedFirstLetter())()"
         }
       case let .quoted(quoted):
-        return "if matches(string: \"\(quoted)\") {"
+        return "try read(string: \"\(quoted)\")"
       case .indent:
-        return "if readIndent() {"
+        return "try readIndent()"
       case .dedent:
-        return "if readDedent() {"
+        return "try readDedent()"
     }
   }
 }

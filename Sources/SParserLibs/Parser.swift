@@ -8,13 +8,13 @@ public class Parser {
   private var historyPosition: Int = 0
 
   private var isAtBeginningOfLine = true
-  private var indentLevel: [Int] = []
+  private(set) var indentLevel: [Int] = []
 
   private var saveDepth = 0
 
-  private var currentLine = ""
-  private var lineNumber = 0
-  private var charNumber = 0
+  private(set) var currentLine = ""
+  private(set) var lineNumber = 0
+  private(set) var charNumber = 0
 
   private enum Status {
     case none
@@ -23,6 +23,10 @@ public class Parser {
   }
 
   private var status = Status.none
+
+  public func createThrower() -> Thrower {
+    return Thrower(parser: self)
+  }
 
   public func readChar() -> Character {
     if status != .none {
@@ -193,7 +197,7 @@ public class Parser {
   }
 
   public typealias IndentType = Bool
-  public func readIndent() -> IndentType {
+  public func readIndent() throws {
     if status == .none {
       save {
         _ = readChar()
@@ -206,13 +210,13 @@ public class Parser {
     }
     if status == .indent {
       status = .none
-      return true
+      return
     }
-    return false
+    throw createThrower().createError(message: "error parsing indent.")
   }
 
   public typealias DedentType = Bool
-  public func readDedent() -> DedentType {
+  public func readDedent() throws {
     if status == .none {
       save {
         _ = readChar()
@@ -225,20 +229,9 @@ public class Parser {
     }
     if status == .dedent {
       status = .none
-      return true
+      return
     }
-    return false
-  }
-
-  public func throwError(message: String) throws {
-    let errorPosition = charNumber + (indentLevel.last ?? 0)
-    throw ParserError(
-      message: [
-        "\(lineNumber):\(errorPosition):\(message)",
-        currentLine,
-        Array(repeating: " ", count: errorPosition).joined() + "^",
-      ].joined(separator: "\n")
-    )
+    throw createThrower().createError(message: "error parsing dedent.")
   }
 
   public init(stream: Stream) {
