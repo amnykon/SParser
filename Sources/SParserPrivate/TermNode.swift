@@ -13,7 +13,7 @@ class TermNode {
     var takenTermNames = takenTermNames
     let readCall: String = isRecursive || term == nil ? "" : "\(indent)\(term?.buildReadCall(takenTermNames: &takenTermNames) ?? "")\n"
 
-    let childHandlers: String = ( children.map{"\(indent)  do {\n\($0.buildString(ruleName: ruleName, indent: "\(indent)  ", takenTermNames: takenTermNames))\(indent)  } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}"} + [""]).joined(separator: "\n")
+    let childHandlers: String = ( children.map{"\(indent)  do {\n  \($0.buildString(ruleName: ruleName, indent: "\(indent)  ", takenTermNames: takenTermNames))\(indent)  } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}"} + [""]).joined(separator: "\n")
 
     let evaluatorCall: String
     if children.reduce(false, {$0 || !($1.term?.isConditional ?? true)}) {

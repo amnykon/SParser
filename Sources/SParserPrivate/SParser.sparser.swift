@@ -6,9 +6,9 @@ extension Parser {
   public func readSyntax() throws -> SyntaxType {
     let thrower = createThrower()
     do {
-    let importRule = try? readImportRule()
+      let importRule = try? readImportRule()
       do {
-      let rule = try readZeroOrMore({try readRule()})
+        let rule = try readZeroOrMore({try readRule()})
         return try recursivelyRead(syntax: eval0Syntax(importRule: importRule, rules: rule))
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       throw thrower.createError(message:"error parsing syntax. expect [RuleType]")
@@ -26,13 +26,13 @@ extension Parser {
   private func readImportRule() throws -> ImportRuleType {
     let thrower = createThrower()
     do {
-    try read(string: "imports\n")
+      try read(string: "imports\n")
       do {
-      try readIndent()
+        try readIndent()
         do {
-        let line = try readOneOrMore({try readLine()})
+          let line = try readOneOrMore({try readLine()})
           do {
-          try readDedent()
+            try readDedent()
             return try recursivelyRead(importRule: eval0ImportRule(imports: line))
           } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
           throw thrower.createError(message:"error parsing importRule. expect ")
@@ -54,25 +54,25 @@ extension Parser {
   private func readRule() throws -> RuleType {
     let thrower = createThrower()
     do {
-    let name = try readName()
+      let name = try readName()
       do {
-      try read(string: "\n")
+        try read(string: "\n")
         do {
-        try readIndent()
+          try readIndent()
           do {
-          try read(string: "type\n")
+            try read(string: "type\n")
             do {
-            try readIndent()
+              try readIndent()
               do {
-              let accessLevel = try? readAccessLevel()
+                let accessLevel = try? readAccessLevel()
                 do {
-                let line = try readLine()
+                  let line = try readLine()
                   do {
-                  try readDedent()
+                    try readDedent()
                     do {
-                    let patterns = try readPatterns()
+                      let patterns = try readPatterns()
                       do {
-                      try readDedent()
+                        try readDedent()
                         return try recursivelyRead(rule: eval0Rule(name: name, accessLevel: accessLevel, type: line, patterns: patterns))
                       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
                       throw thrower.createError(message:"error parsing rule. expect ")
@@ -106,15 +106,15 @@ extension Parser {
   private func readAccessLevel() throws -> AccessLevelType {
     let thrower = createThrower()
     do {
-    try read(string: "public ")
+      try read(string: "public ")
       return try recursivelyRead(accessLevel: eval0AccessLevel())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    try read(string: "internal ")
+      try read(string: "internal ")
       return try recursivelyRead(accessLevel: eval1AccessLevel())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    try read(string: "private ")
+      try read(string: "private ")
       return try recursivelyRead(accessLevel: eval2AccessLevel())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     throw thrower.createError(message:"error parsing accessLevel. expect \"public \", \"internal \", \"private \"")
@@ -139,7 +139,7 @@ extension Parser {
   private func recursivelyRead(patterns: PatternsType) throws -> PatternsType {
     let thrower = createThrower()
     do {
-    let pattern = try readPattern()
+      let pattern = try readPattern()
       return try recursivelyRead(patterns: eval0Patterns(patterns: patterns, pattern: pattern))
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     return patterns
@@ -155,15 +155,15 @@ extension Parser {
   private func readPattern() throws -> PatternType {
     let thrower = createThrower()
     do {
-    try read(string: "::=")
+      try read(string: "::=")
       do {
-      let cws = try readCws()
+        let cws = try readCws()
         do {
-        let term = try readZeroOrMore({try readTerm()})
+          let term = try readZeroOrMore({try readTerm()})
           do {
-          try read(string: "\n")
+            try read(string: "\n")
             do {
-            let multiLineString = try readMultiLineString()
+              let multiLineString = try readMultiLineString()
               return try recursivelyRead(pattern: eval0Pattern(cws: cws, terms: term, multiLineString: multiLineString))
             } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
             throw thrower.createError(message:"error parsing pattern. expect MultiLineStringType")
@@ -187,31 +187,31 @@ extension Parser {
   private func readTerm() throws -> TermType {
     let thrower = createThrower()
     do {
-    try read(string: "indent")
+      try read(string: "indent")
       do {
-      let cws = try readCws()
+        let cws = try readCws()
         return try recursivelyRead(term: eval0Term(cws: cws))
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       throw thrower.createError(message:"error parsing term. expect CwsType")
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    try read(string: "dedent")
+      try read(string: "dedent")
       do {
-      let cws = try readCws()
+        let cws = try readCws()
         return try recursivelyRead(term: eval1Term(cws: cws))
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       throw thrower.createError(message:"error parsing term. expect CwsType")
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    let name = try readName()
+      let name = try readName()
       do {
-      try read(string: ":")
+        try read(string: ":")
         do {
-        let name1 = try readName()
+          let name1 = try readName()
           do {
-          let termModifier = try? readTermModifier()
+            let termModifier = try? readTermModifier()
             do {
-            let cws = try readCws()
+              let cws = try readCws()
               return try recursivelyRead(term: eval2Term(name: name, type: name1, termModifier: termModifier, cws: cws))
             } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
             throw thrower.createError(message:"error parsing term. expect CwsType")
@@ -221,9 +221,9 @@ extension Parser {
         throw thrower.createError(message:"error parsing term. expect NameType")
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       do {
-      let termModifier = try? readTermModifier()
+        let termModifier = try? readTermModifier()
         do {
-        let cws = try readCws()
+          let cws = try readCws()
           return try recursivelyRead(term: eval3Term(type: name, termModifier: termModifier, cws: cws))
         } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
         throw thrower.createError(message:"error parsing term. expect CwsType")
@@ -231,9 +231,9 @@ extension Parser {
       throw thrower.createError(message:"error parsing term. expect \":\", TermModifierType?")
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    let quotedString = try readQuotedString()
+      let quotedString = try readQuotedString()
       do {
-      let cws = try readCws()
+        let cws = try readCws()
         return try recursivelyRead(term: eval4Term(quotedString: quotedString, cws: cws))
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       throw thrower.createError(message:"error parsing term. expect CwsType")
@@ -263,15 +263,15 @@ extension Parser {
   private func readTermModifier() throws -> TermModifierType {
     let thrower = createThrower()
     do {
-    try read(string: "?")
+      try read(string: "?")
       return try recursivelyRead(termModifier: eval0TermModifier())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    try read(string: "+")
+      try read(string: "+")
       return try recursivelyRead(termModifier: eval1TermModifier())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     do {
-    try read(string: "*")
+      try read(string: "*")
       return try recursivelyRead(termModifier: eval2TermModifier())
     } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
     throw thrower.createError(message:"error parsing termModifier. expect \"?\", \"+\", \"*\"")
@@ -293,9 +293,9 @@ extension Parser {
   private func readName() throws -> NameType {
     let thrower = createThrower()
     do {
-    let letter = try readLetter()
+      let letter = try readLetter()
       do {
-      let letterDigits = try readLetterDigits()
+        let letterDigits = try readLetterDigits()
         return try recursivelyRead(name: eval0Name(letter: letter, letterDigits: letterDigits))
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       throw thrower.createError(message:"error parsing name. expect LetterDigitsType")
