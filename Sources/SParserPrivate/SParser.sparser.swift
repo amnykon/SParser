@@ -16,8 +16,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing syntax. expect ImportRuleType?")
   }
   private func recursivelyRead(syntax: SyntaxType) throws -> SyntaxType {
-    let thrower = createThrower()
-    return syntax
+      return syntax
   }
   private func eval0Syntax(importRule: ImportRuleType?, rules: [RuleType]) -> SyntaxType {
     return Syntax(imports: importRule ?? [], rules: rules)
@@ -45,8 +44,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing importRule. expect \"imports\n\"")
   }
   private func recursivelyRead(importRule: ImportRuleType) throws -> ImportRuleType {
-    let thrower = createThrower()
-    return importRule
+      return importRule
   }
   private func eval0ImportRule(imports: [LineType]) -> ImportRuleType {
     return imports
@@ -98,8 +96,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing rule. expect NameType")
   }
   private func recursivelyRead(rule: RuleType) throws -> RuleType {
-    let thrower = createThrower()
-    return rule
+      return rule
   }
   private func eval0Rule(name: NameType, accessLevel: AccessLevelType?, type: LineType, patterns: PatternsType) -> RuleType {
     return Rule(name: name, accessLevel: accessLevel ?? .internal, type: type, patterns: patterns)
@@ -123,8 +120,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing accessLevel. expect \"public \", \"internal \", \"private \"")
   }
   private func recursivelyRead(accessLevel: AccessLevelType) throws -> AccessLevelType {
-    let thrower = createThrower()
-    return accessLevel
+      return accessLevel
   }
   private func eval0AccessLevel() -> AccessLevelType {
     return .public
@@ -138,8 +134,7 @@ extension Parser {
 
   private typealias PatternsType = [Pattern]
   private func readPatterns() throws -> PatternsType {
-    let thrower = createThrower()
-    return try recursivelyRead(patterns: eval1Patterns())
+      return try recursivelyRead(patterns: eval1Patterns())
   }
   private func recursivelyRead(patterns: PatternsType) throws -> PatternsType {
     let thrower = createThrower()
@@ -182,8 +177,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing pattern. expect \"::=\"")
   }
   private func recursivelyRead(pattern: PatternType) throws -> PatternType {
-    let thrower = createThrower()
-    return pattern
+      return pattern
   }
   private func eval0Pattern(cws: CwsType, terms: [TermType], multiLineString: MultiLineStringType) -> PatternType {
     return Pattern(terms: terms, evaluator: multiLineString, id: 0)
@@ -247,8 +241,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing term. expect \"indent\", \"dedent\", NameType, QuotedStringType")
   }
   private func recursivelyRead(term: TermType) throws -> TermType {
-    let thrower = createThrower()
-    return term
+      return term
   }
   private func eval0Term(cws: CwsType) -> TermType {
     return .indent
@@ -284,8 +277,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing termModifier. expect \"?\", \"+\", \"*\"")
   }
   private func recursivelyRead(termModifier: TermModifierType) throws -> TermModifierType {
-    let thrower = createThrower()
-    return termModifier
+      return termModifier
   }
   private func eval0TermModifier() -> TermModifierType {
     return .optional
@@ -311,8 +303,7 @@ extension Parser {
     throw thrower.createError(message:"error parsing name. expect LetterType")
   }
   private func recursivelyRead(name: NameType) throws -> NameType {
-    let thrower = createThrower()
-    return name
+      return name
   }
   private func eval0Name(letter: LetterType, letterDigits: LetterDigitsType) -> NameType {
     return String(letter) + letterDigits

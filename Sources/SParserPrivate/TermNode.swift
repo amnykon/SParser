@@ -29,6 +29,24 @@ class TermNode {
     return "\(readCall)\(childHandlers)\(evaluatorCall)"
   }
 
+  var throwerDeclaration: String {
+    for child in children {
+      if child.throwerDeclaration != "" {
+        return child.throwerDeclaration
+      }
+    }
+
+    if children.reduce(false, {$0 || !($1.term?.isConditional ?? true)}) {
+      return ""
+    } else if pattern != nil {
+      return ""
+    } else if isRecursive && children.count == 0 {
+      return ""
+    } else {
+      return "  let thrower = createThrower()\n"
+    }
+  }
+
   init(term: Term?, pattern: Pattern? = nil) {
     self.term = term
     self.pattern = pattern
