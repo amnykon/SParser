@@ -7,3 +7,69 @@ letterDigits
     return String(letterDigit) + letterDigits
   ::=
     return ""
+Double
+  type
+    public Double
+  ::= significand
+    return significand
+  ::= significand "e" exponent
+    return significand * pow(10.0,exponent)
+  ::= significand "E" exponent
+    return significand * pow(10.0,exponent)
+exponent
+  type
+    Double
+  ::= exponent digit
+    return exponent * 10.0 + Double(digit)
+  ::= "-" exponent
+    return -exponent
+  ::= "+" exponent
+    return exponent
+  ::=
+    return 0.0
+significand
+  type
+    Double
+  ::= wholeSignificand
+    return wholeSignificand
+  ::= "." fractionalSignificand
+    return fractionalSignificand
+  ::= wholeSignificand "." fractionalSignificand
+    return wholeSignificand + fractionalSignificand
+wholeSignificand
+  type
+    Double
+  ::= wholeSignificand digit
+    return wholeSignificand * 10.0 + Double(digit)
+  ::= digit
+    return Double(digit)
+fractionalSignificand
+  type
+    Double
+  ::= digit fractionalSignificand
+    return (fractionalSignificand + Double(digit)) / 10.0
+  ::=
+    return 0.0
+digit
+  type
+    Int
+  ::= "0"
+    return 0
+  ::= "1"
+    return 1
+  ::= "2"
+    return 2
+  ::= "3"
+    return 3
+  ::= "4"
+    return 4
+  ::= "5"
+    return 5
+  ::= "6"
+    return 6
+  ::= "7"
+    return 7
+  ::= "8"
+    return 8
+  ::= "9"
+    return 9
