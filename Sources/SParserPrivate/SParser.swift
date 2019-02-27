@@ -6,7 +6,7 @@ extension Parser {
   public func readSyntax() throws -> SyntaxType {
     let thrower = createThrower()
     do {
-      let importRule = try? readImportRule()
+      let importRule = try readOptional({try readImportRule()})
       do {
         let rule = try readZeroOrMore({try readRule()})
         return try recursivelyRead(syntax: eval0Syntax(importRule: importRule, rules: rule))
@@ -64,7 +64,7 @@ extension Parser {
             do {
               try readIndent()
               do {
-                let accessLevel = try? readAccessLevel()
+                let accessLevel = try readOptional({try readAccessLevel()})
                 do {
                   let line = try readLine()
                   do {
@@ -209,7 +209,7 @@ extension Parser {
         do {
           let name1 = try readName()
           do {
-            let termModifier = try? readTermModifier()
+            let termModifier = try readOptional({try readTermModifier()})
             do {
               let cws = try readCws()
               return try recursivelyRead(term: eval2Term(name: name, type: name1, termModifier: termModifier, cws: cws))
@@ -221,7 +221,7 @@ extension Parser {
         throw thrower.createError(message:"error parsing term. expect NameType")
       } catch let error as ParserError where error.thrower !== nil && error.thrower !== thrower {}
       do {
-        let termModifier = try? readTermModifier()
+        let termModifier = try readOptional({try readTermModifier()})
         do {
           let cws = try readCws()
           return try recursivelyRead(term: eval3Term(type: name, termModifier: termModifier, cws: cws))

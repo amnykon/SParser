@@ -80,7 +80,6 @@ enum Term {
       case let .type(_, type, modifier):
         switch modifier {
         case .optional:
-          return "let \(getNodeName(takenTermNames: &takenTermNames)) = try? read\(type.capitalizedFirstLetter())()"
           return "let \(getNodeName(takenTermNames: &takenTermNames)) = try readOptional({try read\(type.capitalizedFirstLetter())()})"
         case .oneOrMore:
           return "let \(getNodeName(takenTermNames: &takenTermNames)) = try readOneOrMore({try read\(type.capitalizedFirstLetter())()})"
