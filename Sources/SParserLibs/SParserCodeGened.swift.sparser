@@ -1,0 +1,9 @@
+imports
+  Foundation
+letterDigits
+  type
+    public String
+  ::= letterDigit letterDigits
+    return String(letterDigit) + letterDigits
+  ::=
+    return ""

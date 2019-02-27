@@ -118,34 +118,7 @@ extension Parser {
   }
 }
 
-/*
-letterDigits
-  type
-    String
-  ::= letterDigit letterDigits
-    return String(letterDigit) + letterDigits
-  ::=
-    return ""
-*/
-fileprivate func evalLetterDigits(letterDigit:Parser.LetterDigitType, letterDigits:Parser.LetterDigitsType) -> Parser.LetterDigitsType {
-    return String(letterDigit) + letterDigits
-}
-
-fileprivate func evalLetterDigits() -> Parser.LetterDigitsType {
-  return ""
-}
-
 extension Parser {
-  public typealias LetterDigitsType = String
-  public func readLetterDigits() throws -> LetterDigitsType {
-    do {
-      let letterDigit = try readLetterDigit()
-      let letterDigits = try readLetterDigits()
-      return evalLetterDigits(letterDigit:letterDigit, letterDigits:letterDigits)
-    } catch let error as ParserError where error.thrower != nil {}
-    return evalLetterDigits()
-  }
-
   public typealias LetterDigitType = Character
   public func readLetterDigit() throws -> LetterDigitType {
     var char: Character?
