@@ -5,8 +5,13 @@ import SParserLibs
 var exitStatus: Int32 = 0
 
 for inFile in CommandLine.arguments.dropFirst() {
+  guard inFile.hasSuffix(".sparser") else {
+    continue
+  }
+  let outFile = inFile.components(separatedBy: ".").dropLast().joined(separator: ".")
+
   let inUrl = NSURL.fileURL(withPath: inFile)
-  let outUrl = NSURL.fileURL(withPath: inFile + ".swift")
+  let outUrl = NSURL.fileURL(withPath: outFile)
   print("\(inUrl.absoluteString) -> \(outUrl.absoluteString)")
 
   guard let inStream = try? UrlStream(from: inUrl) else {
